@@ -395,7 +395,7 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
     <div class="hbtn" onclick="openGM()" title="God Mode" style="background:var(--ylight);">
       <svg viewBox="0 0 24 24" fill="var(--y)" width="17" height="17"><path d="M13 2L4.5 13.5H11L10 22L20.5 10H14L13 2Z"/></svg>
     </div>
-    <div class="hbtn" onclick="go('login')"><svg viewBox="0 0 24 24" fill="var(--gray)"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></div>
+    <div class="hbtn" onclick="logout()"><svg viewBox="0 0 24 24" fill="var(--gray)"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></div>
   </div>
   <div class="cbody" id="cbody">
     <div class="ai-tag">LOCALLY AI</div>
@@ -446,7 +446,7 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
       <div class="pr"><span class="prl">Travel Fee</span><span class="prv" id="q-t">Rs 150</span></div>
       <div class="pr"><span class="prl">⚡ Surge (Urgency)</span><span class="prv surge" id="q-s">Rs 200</span></div>
       <div class="pr" style="border:none;margin-top:2px;"><span class="prl" style="font-weight:700;color:var(--blk);">Total Estimate</span><span class="pr-tot" id="q-tot">Rs 1,150</span></div>
-      <button class="btn-y">💡 Budget Alternative — Save 30%</button>
+      <button class="btn-y" onclick="negotiate()">💡 Budget Alternative — Save 30%</button>
       <button class="btn-bk2" onclick="booknow()">Book Now →</button>
     </div>
   </div>
@@ -534,7 +534,7 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
         <div class="onpill"><div class="ondot"></div><div class="ontxt">Online</div></div>
-        <span style="font-size:11px;color:var(--gray);cursor:pointer;" onclick="go('login')">Sign out</span>
+        <span style="font-size:11px;color:var(--gray);cursor:pointer;" onclick="logout()">Sign out</span>
       </div>
     </div>
     <div class="stg">
@@ -594,17 +594,17 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
   </div>
   <div class="prfbody">
     <div class="mgrp">
-      <div class="mi"><div class="mico" style="background:var(--blk);"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><span class="mlbl">Edit Profile</span><span class="marr">›</span></div>
-      <div class="mi"><div class="mico" style="background:#34A853;"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div><span class="mlbl">Payment Methods</span><span class="marr">›</span></div>
-      <div class="mi"><div class="mico" style="background:var(--y);"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div><span class="mlbl">Trust & Safety</span><span class="marr">›</span></div>
+      <div class="mi" onclick="openEditProfile()"><div class="mico" style="background:var(--blk);"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div><span class="mlbl">Edit Profile</span><span class="marr">›</span></div>
+      <div class="mi" onclick="openPaymentMethods()"><div class="mico" style="background:#34A853;"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div><span class="mlbl">Payment Methods</span><span class="marr">›</span></div>
+      <div class="mi" onclick="openTrustSafety()"><div class="mico" style="background:var(--y);"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div><span class="mlbl">Trust & Safety</span><span class="marr">›</span></div>
     </div>
     <div class="mgrp">
-      <div class="mi"><div class="mico" style="background:#8E24AA;"><svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg></div><span class="mlbl">Booking History</span><span class="marr">›</span></div>
-      <div class="mi"><div class="mico" style="background:#0097A7;"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><span class="mlbl">Support & Help</span><span class="marr">›</span></div>
-      <div class="mi"><div class="mico" style="background:#455A64;"><svg viewBox="0 0 24 24"><path d="M12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6zm7.14-3.06c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.22-.07.47.12.61l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg></div><span class="mlbl">Settings</span><span class="marr">›</span></div>
+      <div class="mi" onclick="openBookingHistory()"><div class="mico" style="background:#8E24AA;"><svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg></div><span class="mlbl">Booking History</span><span class="marr">›</span></div>
+      <div class="mi" onclick="openSupportHelp()"><div class="mico" style="background:#0097A7;"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div><span class="mlbl">Support & Help</span><span class="marr">›</span></div>
+      <div class="mi" onclick="openSettings()"><div class="mico" style="background:#455A64;"><svg viewBox="0 0 24 24"><path d="M12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6zm7.14-3.06c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.22-.07.47.12.61l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58z"/></svg></div><span class="mlbl">Settings</span><span class="marr">›</span></div>
     </div>
     <div class="mgrp">
-      <div class="mi" onclick="go('login')"><div class="mico" style="background:#EA4335;"><svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></div><span class="mlbl red">Sign Out</span><span class="marr" style="color:#EA4335;">›</span></div>
+      <div class="mi" onclick="logout()"><div class="mico" style="background:#EA4335;"><svg viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></div><span class="mlbl red">Sign Out</span><span class="marr" style="color:#EA4335;">›</span></div>
     </div>
   </div>
 </div>
@@ -623,6 +623,188 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
   </div>
 </div>
 
+<!-- EDIT PROFILE MODAL -->
+<div class="ovl" id="editProfileMod" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="sht" style="overflow-y:auto; max-height: 85%;">
+    <div class="sht-pill"></div>
+    <div class="sht-ttl">Edit Profile</div>
+    
+    <label class="flbl">Full Name</label>
+    <input class="finp" type="text" placeholder="Ali Hassan" id="ep-name" oninput="vepname(this)">
+    <div class="errtxt" id="ep-nerr">Name cannot contain numbers or symbols</div>
+    
+    <label class="flbl">Father's Name</label>
+    <input class="finp" type="text" placeholder="Muhammad Hassan" id="ep-fathersName" oninput="vepname(this)">
+    <div class="errtxt" id="ep-fnerr">Father's name cannot contain numbers or symbols</div>
+    
+    <label class="flbl">Email</label>
+    <input class="finp" type="email" placeholder="ali@example.com" id="ep-email">
+    <div class="errtxt" id="ep-emerr">Please enter a valid email address</div>
+    
+    <div id="ep-cnicwrap" style="display:none;">
+      <label class="flbl">CNIC Number</label>
+      <input class="finp" type="text" placeholder="XXXXX-XXXXXXX-X" id="ep-cnic" oninput="fcnic(this)" maxlength="15">
+      <div class="errtxt" id="ep-cnicerr">CNIC must be complete (15 characters)</div>
+    </div>
+    
+    <button class="btn-blk" style="margin-top:12px;" onclick="saveProfile()">Save Changes</button>
+  </div>
+</div>
+
+<!-- PAYMENT METHODS MODAL -->
+<div class="ovl" id="paymentMethodsMod" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="sht" style="overflow-y:auto; max-height: 85%;">
+    <div class="sht-pill"></div>
+    <div class="sht-ttl">Payment Methods</div>
+    
+    <div style="margin-bottom: 16px;">
+      <label class="flbl">Current Payment Methods</label>
+      <div id="pm-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+    
+    <div class="divrow">Add New Card</div>
+    
+    <label class="flbl">Cardholder Name</label>
+    <input class="finp" type="text" placeholder="Ali Hassan" id="pm-cardname" oninput="vepname(this)">
+    <div class="errtxt" id="pm-nameerr">Cardholder name cannot contain numbers/symbols</div>
+    
+    <label class="flbl">Card Number</label>
+    <input class="finp" type="text" placeholder="4214 5678 9012 3456" id="pm-cardnum" oninput="fcardnum(this)" maxlength="19">
+    <div class="errtxt" id="pm-numerr">Card number must be 16 digits</div>
+    
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div>
+        <label class="flbl">Expiry Date</label>
+        <input class="finp" type="text" placeholder="MM/YY" id="pm-cardexp" oninput="fcardexp(this)" maxlength="5">
+        <div class="errtxt" id="pm-experr">Invalid expiry</div>
+      </div>
+      <div>
+        <label class="flbl">CVC</label>
+        <input class="finp" type="password" placeholder="123" id="pm-cardcvc" oninput="fcardcvc(this)" maxlength="3">
+        <div class="errtxt" id="pm-cvcerr">Invalid CVC</div>
+      </div>
+    </div>
+    
+    <button class="btn-blk" style="margin-top:12px;" onclick="savePaymentMethod()">Add Card</button>
+  </div>
+</div>
+
+<!-- TRUST & SAFETY MODAL -->
+<div class="ovl" id="trustSafetyMod" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="sht" style="overflow-y:auto; max-height: 85%;">
+    <div class="sht-pill"></div>
+    <div class="sht-ttl">Trust & Safety</div>
+    
+    <div style="background:var(--lgray); border-radius:18px; padding:16px; margin-bottom:16px; display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:13px; font-weight:600; color:var(--blk);">CNIC Verification</span>
+        <span id="ts-cnicstatus" style="font-size:12px; font-weight:700; color:#34A853;">Verified ✓</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:13px; font-weight:600; color:var(--blk);">Background Check</span>
+        <span style="font-size:12px; font-weight:700; color:#34A853;">Passed ✓</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:13px; font-weight:600; color:var(--blk);">Community Reputation</span>
+        <span style="font-size:12px; font-weight:700; color:var(--yd);">Good Standing</span>
+      </div>
+    </div>
+    
+    <div class="divrow">Verify New Document</div>
+    
+    <label class="flbl">Document Type</label>
+    <select class="finp" id="ts-doctype" style="-webkit-appearance:none; appearance:none; background:var(--lgray) url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236B6B6B%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22/></svg>') no-repeat right 16px center; background-size: 16px;">
+      <option value="cnic">CNIC Number</option>
+      <option value="dl">Driving License</option>
+      <option value="passport">Passport</option>
+    </select>
+    
+    <label class="flbl">Document Number</label>
+    <input class="finp" type="text" placeholder="Enter document number" id="ts-docnum">
+    <div class="errtxt" id="ts-docerr">Document number cannot be empty</div>
+    
+    <button class="btn-blk" style="margin-top:12px;" onclick="submitVerification()">Submit Verification</button>
+  </div>
+</div>
+
+<!-- BOOKING HISTORY MODAL -->
+<div class="ovl" id="bookingHistoryMod" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="sht" style="display:flex; flex-direction:column; max-height: 85%; padding-bottom: 20px;">
+    <div class="sht-pill"></div>
+    <div class="sht-ttl">Booking History</div>
+    
+    <div id="bh-list" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
+      <!-- Dynamically rendered -->
+    </div>
+  </div>
+</div>
+
+<!-- SUPPORT & HELP MODAL -->
+<div class="ovl" id="supportHelpMod" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="sht" style="overflow-y:auto; max-height: 85%;">
+    <div class="sht-pill"></div>
+    <div class="sht-ttl">Support & Help</div>
+    
+    <label class="flbl">Query Type</label>
+    <select class="finp" id="sh-category" style="-webkit-appearance:none; appearance:none; background:var(--lgray) url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236B6B6B%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22/></svg>') no-repeat right 16px center; background-size: 16px;">
+      <option value="booking">Booking Issue</option>
+      <option value="payment">Payment Problem</option>
+      <option value="account">Account Access</option>
+      <option value="other">General Inquiry</option>
+    </select>
+    
+    <label class="flbl">Describe your issue</label>
+    <textarea class="finp" placeholder="Please describe your issue in detail (min 10 chars)..." id="sh-desc" rows="3" style="resize:none; font-family:var(--f);"></textarea>
+    <div class="errtxt" id="sh-descerr">Please write at least 10 characters</div>
+    
+    <button class="btn-blk" style="margin-top:12px;" onclick="submitSupportTicket()">Submit Ticket</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="ovl" id="settingsMod" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="sht" style="overflow-y:auto; max-height: 85%;">
+    <div class="sht-pill"></div>
+    <div class="sht-ttl">Settings</div>
+    
+    <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:14px; font-weight:700; color:var(--blk);">Push Notifications</div>
+          <div style="font-size:11px; color:var(--gray);">Enable alerts for job updates</div>
+        </div>
+        <input type="checkbox" id="set-notify" checked style="width:20px; height:20px; accent-color:var(--y);">
+      </div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--border); padding-top:14px;">
+        <div>
+          <div style="font-size:14px; font-weight:700; color:var(--blk);">Location Services</div>
+          <div style="font-size:11px; color:var(--gray);">Share real-time coordinates for tracking</div>
+        </div>
+        <input type="checkbox" id="set-location" checked style="width:20px; height:20px; accent-color:var(--y);">
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--border); padding-top:14px;">
+        <div>
+          <div style="font-size:14px; font-weight:700; color:var(--blk);">Simulate Dark Mode</div>
+          <div style="font-size:11px; color:var(--gray);">Simulate dark themes</div>
+        </div>
+        <input type="checkbox" id="set-dark" onchange="toggleDarkSim(this)" style="width:20px; height:20px; accent-color:var(--y);">
+      </div>
+    </div>
+    
+    <div class="divrow">Security</div>
+    
+    <label class="flbl">Demo Access Code</label>
+    <input class="finp" type="text" placeholder="USER-2026" id="set-code">
+    <div class="errtxt" id="set-codeerr">Access code must be at least 4 characters</div>
+    
+    <button class="btn-blk" style="margin-top:12px;" onclick="saveSettings()">Save Settings</button>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="tst" id="toastel">
   <div class="ticon"><svg viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11L10 22L20.5 10H14L13 2Z"/></svg></div>
@@ -634,17 +816,153 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
 
 
 <script>
+const API_URL = 'http://localhost:5000/api';
+
+// Helper to get auth header
+function getAuthHeader() {
+  const token = localStorage.getItem('token');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
+// Navigation
 function go(id){
   document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
   document.getElementById(id).classList.add('on');
+  
+  // Custom screen load triggers
+  if (id === 'provider') {
+    loadProviderDashboard();
+  } else if (id === 'profile') {
+    loadUserProfile();
+  }
 }
-function doLogin(){
-  const c=document.getElementById('l-code').value.trim();
-  const e=document.getElementById('l-err');
-  if(c==='USER-2026'){e.classList.remove('on');go('chat');}
-  else if(c==='PROV-2026'){e.classList.remove('on');go('provider');}
-  else e.classList.add('on');
+
+function logout() {
+  localStorage.clear();
+  go('splash');
 }
+
+// Global state variables
+let currentBooking = null;
+let trackingInterval = null;
+let selectedProvider = null;
+
+// Auth Check & Initialization
+document.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
+  if (token) {
+    if (role === 'provider') {
+      go('provider');
+    } else {
+      go('chat');
+    }
+  } else {
+    go('splash');
+  }
+});
+
+// Login
+async function doLogin(){
+  const email = document.getElementById('l-email').value.trim();
+  const code = document.getElementById('l-code').value.trim();
+  const errEl = document.getElementById('l-err');
+  
+  if (!email || !code) {
+    errEl.textContent = 'Please fill out all fields';
+    errEl.classList.add('on');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code })
+    });
+    
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent = data.message || 'Invalid Hackathon Demo Code';
+      errEl.classList.add('on');
+      return;
+    }
+    
+    errEl.classList.remove('on');
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('role', data.role);
+    localStorage.setItem('user_name', data.user.name);
+    localStorage.setItem('user_email', data.user.email);
+    
+    tst('Login Successful', `Welcome ${data.user.name}`);
+    
+    if (data.role === 'provider') {
+      go('provider');
+    } else {
+      go('chat');
+    }
+  } catch (err) {
+    console.error(err);
+    errEl.textContent = 'Connection error. Is backend running?';
+    errEl.classList.add('on');
+  }
+}
+
+// Signup
+async function dosignup(){
+  const name = document.getElementById('s-name').value.trim();
+  const email = document.querySelector('#signup input[type="email"]').value.trim();
+  const fathersName = document.querySelectorAll('#signup input[type="text"]')[1].value.trim();
+  const isProvider = document.getElementById('rp').classList.contains('on');
+  const role = isProvider ? 'provider' : 'consumer';
+  const cnic = isProvider ? document.getElementById('cnic').value.trim() : '';
+
+  if (!name || !email) {
+    tst('Validation Error', 'Name and Email are required');
+    return;
+  }
+
+  if (isProvider) {
+    const cnicDigits = cnic.replace(/[^0-9]/g,'');
+    if (cnicDigits.length < 13) {
+      document.getElementById('cnicerr').classList.add('on');
+      return;
+    }
+    document.getElementById('cnicerr').classList.remove('on');
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, fathersName, email, role, cnic })
+    });
+    
+    const data = await res.json();
+    if (!res.ok) {
+      tst('Registration Failed', data.message || 'Error occurred');
+      return;
+    }
+    
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('role', data.role);
+    localStorage.setItem('user_name', data.user.name);
+    localStorage.setItem('user_email', data.user.email);
+    
+    tst('Account Created', `Logged in as ${data.user.name}`);
+    
+    if (data.role === 'provider') {
+      go('provider');
+    } else {
+      go('chat');
+    }
+  } catch (err) {
+    console.error(err);
+    tst('Connection Error', 'Could not reach server.');
+  }
+}
+
+// Validation Helpers
 function vname(el){
   const ok=/^[a-zA-Z\s]*$/.test(el.value);
   el.classList.toggle('err',!ok);
@@ -662,40 +980,926 @@ function fcnic(el){
   if(v.length>13)v=v.slice(0,13)+'-'+v.slice(13);
   el.value=v.slice(0,15);
 }
-function dosignup(){
-  const isP=document.getElementById('rp').classList.contains('on');
-  if(isP){
-    const c=document.getElementById('cnic').value.replace(/[^0-9]/g,'');
-    const er=document.getElementById('cnicerr');
-    if(c.length<13){er.classList.add('on');return;}
-    er.classList.remove('on');
+
+// Send Message (Chat Flow)
+async function sendm(){
+  const ci = document.getElementById('ci');
+  const message = ci.value.trim();
+  if(!message) return;
+
+  const cb = document.getElementById('cbody');
+  
+  // 1. Append user message
+  const uMsg = document.createElement('div');
+  uMsg.className = 'bbl me';
+  uMsg.textContent = message;
+  cb.appendChild(uMsg);
+  
+  ci.value = '';
+  cb.scrollTop = cb.scrollHeight;
+
+  // Show AI terminal and loading state
+  const term = document.getElementById('term');
+  const ai2 = document.getElementById('ai2');
+  const pstrip = document.getElementById('pstrip');
+  
+  term.style.display = 'block';
+  ai2.style.display = 'none';
+  pstrip.style.display = 'none';
+  
+  // Set loading terminal logs
+  term.innerHTML = `
+    <div class="tl">Parsing request...</div>
+    <div class="tl hl">Intent: Extracting details...</div>
+    <span class="tcur">█</span>
+  `;
+
+  try {
+    const res = await fetch(`${API_URL}/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ message })
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      term.innerHTML = `<div class="tl" style="color: #EA4335">Error: ${data.message || 'Failed to connect'}</div>`;
+      return;
+    }
+
+    // Update terminal output with AI results
+    term.innerHTML = `
+      <div class="tl">Parsing request...</div>
+      <div class="tl hl">Intent: ${data.intent.serviceType} [URGENT]</div>
+      <div class="tl">Urgency rating: ${data.intent.urgencyScore}/10</div>
+      <div class="tl hl">Matched ${data.providers.length} top providers ✓</div>
+    `;
+
+    // Append AI reply
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'bbl ai';
+    aiMsg.textContent = data.reply;
+    cb.appendChild(aiMsg);
+
+    // Build providers carousel
+    const prow = pstrip.querySelector('.prow');
+    prow.innerHTML = '';
+    
+    data.providers.forEach(p => {
+      const pcard = document.createElement('div');
+      pcard.className = 'pcard';
+      pcard.onclick = () => openQ(p);
+      
+      const badge = p.rating >= 4.8 ? 'TOP' : 'NEAR';
+      
+      pcard.innerHTML = `
+        <div class="pc-hd">
+          <div class="pc-nm">${p.name}</div>
+          <div class="pc-bdg">${badge}</div>
+        </div>
+        <div class="pc-d">${p.distance} · ${p.eta} ETA</div>
+        <div class="pc-s">★ ${p.rating}</div>
+        <div class="pc-p">${p.totalEstimate}</div>
+      `;
+      prow.appendChild(pcard);
+    });
+
+    // Make elements visible
+    ai2.style.display = 'block';
+    pstrip.style.display = 'block';
+    cb.scrollTop = cb.scrollHeight;
+
+  } catch (err) {
+    console.error(err);
+    term.innerHTML = `<div class="tl" style="color: #EA4335">Connection lost to local server.</div>`;
   }
-  go('chat');
 }
-function openQ(n,b,t,s,tot){
-  document.getElementById('q-nm').textContent=n+' — Plumber';
-  document.getElementById('q-b').textContent=b;
-  document.getElementById('q-t').textContent=t;
-  document.getElementById('q-s').textContent=s;
-  document.getElementById('q-tot').textContent=tot;
+
+// Open Quote details
+function openQ(p) {
+  selectedProvider = p;
+  document.getElementById('q-nm').textContent = `${p.name} — ${p.serviceType}`;
+  document.getElementById('q-b').textContent = p.baseFee;
+  document.getElementById('q-t').textContent = p.travelFee;
+  document.getElementById('q-s').textContent = p.surgeFee;
+  document.getElementById('q-tot').textContent = p.totalEstimate;
+  
+  // Reset negotiation state
+  const negBtn = document.querySelector('#qmod .btn-y');
+  if (negBtn) {
+    negBtn.innerHTML = '💡 Budget Alternative — Save 30%';
+    negBtn.disabled = false;
+    negBtn.style.opacity = '1';
+    negBtn.style.cursor = 'pointer';
+  }
+  
   document.getElementById('qmod').classList.add('open');
 }
-function booknow(){
-  document.getElementById('qmod').classList.remove('open');
-  tst('Provider is on the way!','Usman Khan · 8 min ETA');
-  setTimeout(()=>go('tracker'),1000);
+
+function negotiate() {
+  if (!selectedProvider) return;
+  
+  const baseFee = parseFloat(selectedProvider.baseFee.replace(/[^0-9.]/g,'')) || 0;
+  const travelFee = parseFloat(selectedProvider.travelFee.replace(/[^0-9.]/g,'')) || 0;
+  const surgeFee = parseFloat(selectedProvider.surgeFee.replace(/[^0-9.]/g,'')) || 0;
+  
+  const originalTotal = baseFee + travelFee + surgeFee;
+  const discountedTotal = Math.round(originalTotal * 0.7);
+  
+  document.getElementById('q-tot').innerHTML = `<span style="text-decoration: line-through; color: var(--gray); font-size: 14px; margin-right: 8px;">Rs ${originalTotal}</span> Rs ${discountedTotal}`;
+  
+  selectedProvider.totalEstimate = `Rs ${discountedTotal}`;
+  
+  tst('Negotiation Successful', 'Budget alternative accepted. 30% discount applied.');
+  
+  const negBtn = document.querySelector('#qmod .btn-y');
+  if (negBtn) {
+    negBtn.innerHTML = '✓ Offer Accepted (30% Save)';
+    negBtn.disabled = true;
+    negBtn.style.opacity = '0.6';
+    negBtn.style.cursor = 'default';
+  }
 }
-function completeJob(){document.getElementById('revmod').classList.add('open');}
+
+// Book Now
+async function booknow(){
+  if (!selectedProvider) return;
+  document.getElementById('qmod').classList.remove('open');
+
+  try {
+    const baseFee = parseFloat(selectedProvider.baseFee.replace(/[^0-9.]/g,''));
+    const travelFee = parseFloat(selectedProvider.travelFee.replace(/[^0-9.]/g,''));
+    const surgeFee = parseFloat(selectedProvider.surgeFee.replace(/[^0-9.]/g,''));
+    const totalEstimate = parseFloat(selectedProvider.totalEstimate.replace(/[^0-9.]/g,''));
+
+    const res = await fetch(`${API_URL}/bookings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({
+        providerId: selectedProvider.id,
+        serviceType: selectedProvider.serviceType,
+        baseFee,
+        travelFee,
+        surgeFee,
+        totalEstimate
+      })
+    });
+
+    const booking = await res.json();
+    if (!res.ok) {
+      tst('Booking Failed', booking.message || 'Error occurred');
+      return;
+    }
+
+    currentBooking = booking;
+    tst('Booking Confirmed!', `${selectedProvider.name} is assigned`);
+    
+    // Switch to tracker screen and start active tracking
+    setTimeout(() => {
+      go('tracker');
+      startTracking(booking.id);
+    }, 1000);
+
+  } catch (err) {
+    console.error(err);
+    tst('Connection Error', 'Could not create booking.');
+  }
+}
+
+// Start Live Tracking
+function startTracking(bookingId) {
+  if (trackingInterval) clearInterval(trackingInterval);
+  
+  // Set UI elements initial states
+  updateTrackerUI('confirmed');
+
+  // Poll status every 3 seconds
+  trackingInterval = setInterval(async () => {
+    try {
+      const res = await fetch(`${API_URL}/trackers/${bookingId}`, {
+        headers: getAuthHeader()
+      });
+      const data = await res.json();
+      if (res.ok) {
+        updateTrackerUI(data.status, data.provider);
+        if (data.status === 'completed' || data.status === 'cancelled') {
+          clearInterval(trackingInterval);
+        }
+      }
+    } catch (err) {
+      console.error('Tracking poll failed:', err);
+    }
+  }, 3000);
+}
+
+// Update Tracker Screen UI based on status
+function updateTrackerUI(status, provider) {
+  const steps = document.querySelectorAll('#tracker .step');
+  steps.forEach(s => {
+    s.classList.remove('done', 'act', 'pnd');
+  });
+
+  const headingDesc = document.querySelector('#tracker .c-hdr-inf p');
+  const providerName = provider ? provider.name : 'Usman Khan';
+
+  if (status === 'confirmed') {
+    steps[0].classList.add('done');
+    steps[1].classList.add('act');
+    steps[2].classList.add('pnd');
+    steps[3].classList.add('pnd');
+    headingDesc.textContent = `● ${providerName} — Confirmed`;
+  } else if (status === 'accepted') {
+    steps[0].classList.add('done');
+    steps[1].classList.add('act');
+    steps[2].classList.add('pnd');
+    steps[3].classList.add('pnd');
+    headingDesc.textContent = `● ${providerName} — Preparing`;
+  } else if (status === 'en_route') {
+    steps[0].classList.add('done');
+    steps[1].classList.add('done');
+    steps[2].classList.add('act');
+    steps[3].classList.add('pnd');
+    headingDesc.textContent = `● ${providerName} — En Route`;
+  } else if (status === 'arrived') {
+    steps[0].classList.add('done');
+    steps[1].classList.add('done');
+    steps[2].classList.add('done');
+    steps[3].classList.add('act');
+    headingDesc.textContent = `● ${providerName} — Arrived`;
+  } else if (status === 'completed') {
+    steps[0].classList.add('done');
+    steps[1].classList.add('done');
+    steps[2].classList.add('done');
+    steps[3].classList.add('done');
+    headingDesc.textContent = `● Service Completed`;
+  }
+}
+
+// Mark Job Completed (from Consumer view)
+async function completeJob() {
+  if (!currentBooking) {
+    document.getElementById('revmod').classList.add('open');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/bookings/${currentBooking.id}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ status: 'completed' })
+    });
+
+    if (res.ok) {
+      document.getElementById('revmod').classList.add('open');
+    } else {
+      tst('Error', 'Unable to complete job.');
+    }
+  } catch (err) {
+    console.error(err);
+    document.getElementById('revmod').classList.add('open'); // fallback
+  }
+}
+
+// Rating selection
 let cr=0;
 function rate(n){
   cr=n;
   document.querySelectorAll('.str').forEach((s,i)=>s.classList.toggle('on',i<n));
   document.getElementById('wbox').style.display=n<=2?'block':'none';
 }
-function submitrev(){
-  document.getElementById('revmod').classList.remove('open');
-  tst('Review Submitted!','Thank you for your feedback');
+
+// Submit Review
+async function submitrev(){
+  const comment = document.querySelector('#revmod .rnote').value.trim();
+  if (!currentBooking) {
+    document.getElementById('revmod').classList.remove('open');
+    tst('Review Submitted!', 'Thank you for your feedback');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({
+        bookingId: currentBooking.id,
+        rating: cr || 5,
+        comment
+      })
+    });
+
+    document.getElementById('revmod').classList.remove('open');
+    tst('Review Submitted!', 'Thank you for your feedback');
+  } catch (err) {
+    console.error(err);
+    document.getElementById('revmod').classList.remove('open');
+  }
 }
+
+// Provider Dashboard Logic
+async function loadProviderDashboard() {
+  try {
+    // 1. Fetch Stats
+    const statsRes = await fetch(`${API_URL}/providers/stats`, {
+      headers: getAuthHeader()
+    });
+    const stats = await statsRes.json();
+    if (statsRes.ok) {
+      document.querySelectorAll('#provider .sv')[0].textContent = `Rs ${stats.earnings}`;
+      document.querySelectorAll('#provider .sv')[1].textContent = `${stats.rating} ★`;
+      document.querySelectorAll('#provider .sv')[2].textContent = stats.jobsCompleted;
+    }
+
+    // 2. Fetch Requests
+    const reqRes = await fetch(`${API_URL}/bookings`, {
+      headers: getAuthHeader()
+    });
+    const bookings = await reqRes.json();
+    if (reqRes.ok) {
+      const newRequests = bookings.filter(b => b.status === 'confirmed' || b.status === 'accepted' || b.status === 'en_route' || b.status === 'arrived');
+      const completedRequests = bookings.filter(b => b.status === 'completed');
+
+      const pbody = document.querySelector('#provider .pbody');
+      pbody.innerHTML = '';
+
+      // Render Active requests
+      const activeHeader = document.createElement('div');
+      activeHeader.className = 'sttl';
+      activeHeader.textContent = 'Active Requests';
+      pbody.appendChild(activeHeader);
+
+      if (newRequests.length === 0) {
+        const noReq = document.createElement('div');
+        noReq.style.padding = '16px';
+        noReq.style.textAlign = 'center';
+        noReq.style.fontSize = '12px';
+        noReq.style.color = 'var(--gray)';
+        noReq.textContent = 'No active booking requests.';
+        pbody.appendChild(noReq);
+      } else {
+        newRequests.forEach(b => {
+          const jc = document.createElement('div');
+          jc.className = 'jc';
+          
+          let actionBtnText = 'Accept';
+          let nextStatus = 'accepted';
+          if (b.status === 'accepted') {
+            actionBtnText = 'En Route';
+            nextStatus = 'en_route';
+          } else if (b.status === 'en_route') {
+            actionBtnText = 'Arrive';
+            nextStatus = 'arrived';
+          } else if (b.status === 'arrived') {
+            actionBtnText = 'Complete';
+            nextStatus = 'completed';
+          }
+
+          jc.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div class="jtt">${b.serviceType}</div>
+              <div class="jbdg nw">${b.status.toUpperCase()}</div>
+            </div>
+            <div class="jmeta">📍 Rawalpindi · Rs ${b.totalEstimate} est.</div>
+            <div class="jacts">
+              <button class="jacc" onclick="updateProviderJobStatus('${b.id}', '${nextStatus}')">${actionBtnText}</button>
+              <button class="jdec" onclick="updateProviderJobStatus('${b.id}', 'cancelled')">Cancel</button>
+            </div>
+          `;
+          pbody.appendChild(jc);
+        });
+      }
+
+      // Render completed
+      const compHeader = document.createElement('div');
+      compHeader.className = 'sttl';
+      compHeader.textContent = 'Completed Today';
+      pbody.appendChild(compHeader);
+
+      if (completedRequests.length === 0) {
+        const noComp = document.createElement('div');
+        noComp.style.padding = '16px';
+        noComp.style.textAlign = 'center';
+        noComp.style.fontSize = '12px';
+        noComp.style.color = 'var(--gray)';
+        noComp.textContent = 'No jobs completed today.';
+        pbody.appendChild(noComp);
+      } else {
+        completedRequests.forEach(b => {
+          const jc = document.createElement('div');
+          jc.className = 'jc dn';
+          jc.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+              <div class="jtt">${b.serviceType}</div>
+              <div class="jbdg dn">DONE</div>
+            </div>
+            <div class="jmeta">📍 Completed</div>
+            <div class="jp">Rs ${b.totalEstimate} earned</div>
+          `;
+          pbody.appendChild(jc);
+        });
+      }
+    }
+
+  } catch (err) {
+    console.error('Error loading provider dashboard:', err);
+  }
+}
+
+// Update Provider Job Status
+async function updateProviderJobStatus(bookingId, status) {
+  try {
+    const res = await fetch(`${API_URL}/bookings/${bookingId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ status })
+    });
+    
+    if (res.ok) {
+      tst('Status Updated', `Job set to ${status}`);
+      loadProviderDashboard();
+    } else {
+      tst('Error', 'Unable to update job status.');
+    }
+  } catch (err) {
+    console.error(err);
+    tst('Error', 'Network error updating status.');
+  }
+}
+
+// User Profile loading
+function loadUserProfile() {
+  const name = localStorage.getItem('user_name') || 'Ali Hassan';
+  const email = localStorage.getItem('user_email') || 'ali@example.com';
+  const role = localStorage.getItem('role') || 'consumer';
+  
+  document.querySelector('#profile .prfnm').textContent = name;
+  document.querySelector('#profile .prfem').textContent = email;
+  
+  // Set Avatar initials
+  const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+  document.querySelector('#profile .prfav').textContent = initials;
+
+  const roleTag = document.querySelector('#profile .prftag span');
+  if (role === 'provider') {
+    roleTag.textContent = 'Provider Account';
+  } else {
+    roleTag.textContent = 'Consumer Account';
+  }
+}
+
+// Validation helpers
+function vepname(el) {
+  const ok = /^[a-zA-Z\s]*$/.test(el.value);
+  el.classList.toggle('err', !ok);
+  let errId = '';
+  if (el.id === 'ep-name') errId = 'ep-nerr';
+  else if (el.id === 'ep-fathersName') errId = 'ep-fnerr';
+  else if (el.id === 'pm-cardname') errId = 'pm-nameerr';
+  
+  if (errId) {
+    document.getElementById(errId).classList.toggle('on', !ok);
+  }
+}
+
+function fcardnum(el) {
+  let v = el.value.replace(/[^0-9]/g, '');
+  let formatted = '';
+  for (let i = 0; i < v.length; i++) {
+    if (i > 0 && i % 4 === 0) formatted += ' ';
+    formatted += v[i];
+  }
+  el.value = formatted.slice(0, 19);
+  
+  const digits = v.slice(0, 16);
+  const ok = digits.length === 16;
+  el.classList.toggle('err', !ok && el.value.length > 0);
+  document.getElementById('pm-numerr').classList.toggle('on', !ok && el.value.length > 0);
+}
+
+function fcardexp(el) {
+  let v = el.value.replace(/[^0-9]/g, '');
+  if (v.length > 2) {
+    v = v.slice(0, 2) + '/' + v.slice(2, 4);
+  }
+  el.value = v.slice(0, 5);
+  
+  let ok = true;
+  if (v.length >= 2) {
+    const month = parseInt(v.slice(0, 2));
+    if (month < 1 || month > 12) ok = false;
+  }
+  const isComplete = v.length === 4;
+  el.classList.toggle('err', (!ok || !isComplete) && el.value.length > 0);
+  document.getElementById('pm-experr').classList.toggle('on', (!ok || !isComplete) && el.value.length > 0);
+}
+
+function fcardcvc(el) {
+  let v = el.value.replace(/[^0-9]/g, '');
+  el.value = v.slice(0, 3);
+  const ok = v.length === 3;
+  el.classList.toggle('err', !ok && el.value.length > 0);
+  document.getElementById('pm-cvcerr').classList.toggle('on', !ok && el.value.length > 0);
+}
+
+// 1. Edit Profile Functions
+function openEditProfile() {
+  const name = localStorage.getItem('user_name') || 'Ali Hassan';
+  const email = localStorage.getItem('user_email') || 'ali@example.com';
+  const fathersName = localStorage.getItem('user_fathers_name') || 'Muhammad Hassan';
+  const role = localStorage.getItem('role') || 'consumer';
+  const cnic = localStorage.getItem('user_cnic') || '42101-1234567-8';
+  
+  document.getElementById('ep-name').value = name;
+  document.getElementById('ep-email').value = email;
+  document.getElementById('ep-fathersName').value = fathersName;
+  
+  document.getElementById('ep-name').classList.remove('err');
+  document.getElementById('ep-fathersName').classList.remove('err');
+  document.getElementById('ep-email').classList.remove('err');
+  document.getElementById('ep-nerr').classList.remove('on');
+  document.getElementById('ep-fnerr').classList.remove('on');
+  document.getElementById('ep-emerr').classList.remove('on');
+  
+  const cnicWrap = document.getElementById('ep-cnicwrap');
+  if (role === 'provider') {
+    cnicWrap.style.display = 'block';
+    document.getElementById('ep-cnic').value = cnic;
+    document.getElementById('ep-cnic').classList.remove('err');
+    document.getElementById('ep-cnicerr').classList.remove('on');
+  } else {
+    cnicWrap.style.display = 'none';
+  }
+  
+  document.getElementById('editProfileMod').classList.add('open');
+}
+
+function saveProfile() {
+  const name = document.getElementById('ep-name').value.trim();
+  const email = document.getElementById('ep-email').value.trim();
+  const fathersName = document.getElementById('ep-fathersName').value.trim();
+  const role = localStorage.getItem('role') || 'consumer';
+  
+  let hasErr = false;
+  
+  if (!name || !/^[a-zA-Z\s]+$/.test(name)) {
+    document.getElementById('ep-name').classList.add('err');
+    document.getElementById('ep-nerr').classList.add('on');
+    hasErr = true;
+  }
+  
+  if (!fathersName || !/^[a-zA-Z\s]+$/.test(fathersName)) {
+    document.getElementById('ep-fathersName').classList.add('err');
+    document.getElementById('ep-fnerr').classList.add('on');
+    hasErr = true;
+  }
+  
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('ep-email').classList.add('err');
+    document.getElementById('ep-emerr').classList.add('on');
+    hasErr = true;
+  }
+  
+  if (role === 'provider') {
+    const cnic = document.getElementById('ep-cnic').value.trim();
+    const cnicDigits = cnic.replace(/[^0-9]/g, '');
+    if (cnicDigits.length < 13) {
+      document.getElementById('ep-cnic').classList.add('err');
+      document.getElementById('ep-cnicerr').classList.add('on');
+      hasErr = true;
+    } else {
+      localStorage.setItem('user_cnic', cnic);
+    }
+  }
+  
+  if (hasErr) return;
+  
+  localStorage.setItem('user_name', name);
+  localStorage.setItem('user_email', email);
+  localStorage.setItem('user_fathers_name', fathersName);
+  
+  loadUserProfile();
+  
+  document.getElementById('editProfileMod').classList.remove('open');
+  tst('Profile Updated', 'Changes saved successfully');
+}
+
+// 2. Payment Methods Functions
+function openPaymentMethods() {
+  renderPaymentMethods();
+  
+  document.getElementById('pm-cardname').value = '';
+  document.getElementById('pm-cardnum').value = '';
+  document.getElementById('pm-cardexp').value = '';
+  document.getElementById('pm-cardcvc').value = '';
+  
+  document.getElementById('pm-cardname').classList.remove('err');
+  document.getElementById('pm-cardnum').classList.remove('err');
+  document.getElementById('pm-cardexp').classList.remove('err');
+  document.getElementById('pm-cardcvc').classList.remove('err');
+  
+  document.getElementById('pm-nameerr').classList.remove('on');
+  document.getElementById('pm-numerr').classList.remove('on');
+  document.getElementById('pm-experr').classList.remove('on');
+  document.getElementById('pm-cvcerr').classList.remove('on');
+  
+  document.getElementById('paymentMethodsMod').classList.add('open');
+}
+
+function renderPaymentMethods() {
+  const pmList = document.getElementById('pm-list');
+  pmList.innerHTML = '';
+  
+  let cards = JSON.parse(localStorage.getItem('payment_cards') || '[]');
+  
+  const cashDiv = document.createElement('div');
+  cashDiv.style.background = 'var(--lgray)';
+  cashDiv.style.padding = '12px 16px';
+  cashDiv.style.borderRadius = '14px';
+  cashDiv.style.display = 'flex';
+  cashDiv.style.justifyContent = 'space-between';
+  cashDiv.style.alignItems = 'center';
+  cashDiv.innerHTML = `
+    <div>
+      <div style="font-size:13px; font-weight:700; color:var(--blk);">Cash on Delivery</div>
+      <div style="font-size:11px; color:var(--gray);">Pay when service is completed</div>
+    </div>
+    <span style="color:#34A853; font-weight:700; font-size:12px;">Default ✓</span>
+  `;
+  pmList.appendChild(cashDiv);
+  
+  cards.forEach((card, index) => {
+    const cardDiv = document.createElement('div');
+    cardDiv.style.background = 'var(--lgray)';
+    cardDiv.style.padding = '12px 16px';
+    cardDiv.style.borderRadius = '14px';
+    cardDiv.style.display = 'flex';
+    cardDiv.style.justifyContent = 'space-between';
+    cardDiv.style.alignItems = 'center';
+    cardDiv.innerHTML = `
+      <div>
+        <div style="font-size:13px; font-weight:700; color:var(--blk);">Visa •••• ${card.num.slice(-4)}</div>
+        <div style="font-size:11px; color:var(--gray);">${card.name} · Exp ${card.exp}</div>
+      </div>
+      <button style="border:none; background:transparent; color:#EA4335; font-size:11px; font-weight:700; cursor:pointer;" onclick="deleteCard(${index})">Remove</button>
+    `;
+    pmList.appendChild(cardDiv);
+  });
+}
+
+function savePaymentMethod() {
+  const name = document.getElementById('pm-cardname').value.trim();
+  const num = document.getElementById('pm-cardnum').value.trim();
+  const exp = document.getElementById('pm-cardexp').value.trim();
+  const cvc = document.getElementById('pm-cardcvc').value.trim();
+  
+  let hasErr = false;
+  
+  if (!name || !/^[a-zA-Z\s]+$/.test(name)) {
+    document.getElementById('pm-cardname').classList.add('err');
+    document.getElementById('pm-nameerr').classList.add('on');
+    hasErr = true;
+  }
+  
+  const numDigits = num.replace(/[^0-9]/g, '');
+  if (numDigits.length !== 16) {
+    document.getElementById('pm-cardnum').classList.add('err');
+    document.getElementById('pm-numerr').classList.add('on');
+    hasErr = true;
+  }
+  
+  const expDigits = exp.replace(/[^0-9]/g, '');
+  const month = parseInt(expDigits.slice(0, 2));
+  if (expDigits.length !== 4 || month < 1 || month > 12) {
+    document.getElementById('pm-cardexp').classList.add('err');
+    document.getElementById('pm-experr').classList.add('on');
+    hasErr = true;
+  }
+  
+  if (cvc.length !== 3) {
+    document.getElementById('pm-cardcvc').classList.add('err');
+    document.getElementById('pm-cvcerr').classList.add('on');
+    hasErr = true;
+  }
+  
+  if (hasErr) return;
+  
+  let cards = JSON.parse(localStorage.getItem('payment_cards') || '[]');
+  cards.push({ name, num: numDigits, exp });
+  localStorage.setItem('payment_cards', JSON.stringify(cards));
+  
+  renderPaymentMethods();
+  tst('Card Added', 'Payment card has been saved successfully');
+  
+  document.getElementById('pm-cardname').value = '';
+  document.getElementById('pm-cardnum').value = '';
+  document.getElementById('pm-cardexp').value = '';
+  document.getElementById('pm-cardcvc').value = '';
+}
+
+function deleteCard(index) {
+  let cards = JSON.parse(localStorage.getItem('payment_cards') || '[]');
+  cards.splice(index, 1);
+  localStorage.setItem('payment_cards', JSON.stringify(cards));
+  renderPaymentMethods();
+  tst('Card Removed', 'Card has been deleted from your account');
+}
+
+// 3. Trust & Safety Functions
+function openTrustSafety() {
+  const role = localStorage.getItem('role') || 'consumer';
+  const cnicStatus = document.getElementById('ts-cnicstatus');
+  if (role === 'provider') {
+    cnicStatus.textContent = 'Verified ✓';
+    cnicStatus.style.color = '#34A853';
+  } else {
+    cnicStatus.textContent = 'Not Verified (Optional)';
+    cnicStatus.style.color = 'var(--gray)';
+  }
+  
+  document.getElementById('ts-docnum').value = '';
+  document.getElementById('ts-docnum').classList.remove('err');
+  document.getElementById('ts-docerr').classList.remove('on');
+  
+  document.getElementById('trustSafetyMod').classList.add('open');
+}
+
+function submitVerification() {
+  const num = document.getElementById('ts-docnum').value.trim();
+  if (!num) {
+    document.getElementById('ts-docnum').classList.add('err');
+    document.getElementById('ts-docerr').classList.add('on');
+    return;
+  }
+  
+  document.getElementById('ts-docnum').classList.remove('err');
+  document.getElementById('ts-docerr').classList.remove('on');
+  
+  tst('Verification Submitted', 'Our safety team is validating your documents');
+  document.getElementById('trustSafetyMod').classList.remove('open');
+}
+
+// 4. Booking History Functions
+async function openBookingHistory() {
+  const bhList = document.getElementById('bh-list');
+  bhList.innerHTML = '<div style="padding:20px; text-align:center; font-size:12px; color:var(--gray);">Loading bookings...</div>';
+  document.getElementById('bookingHistoryMod').classList.add('open');
+  
+  try {
+    const res = await fetch(`${API_URL}/bookings`, {
+      headers: getAuthHeader()
+    });
+    const bookings = await res.json();
+    
+    bhList.innerHTML = '';
+    if (!res.ok || bookings.length === 0) {
+      bhList.innerHTML = `
+        <div style="background:var(--lgray); border-radius:18px; padding:14px; margin-bottom: 8px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div style="font-size:13px; font-weight:700; color:var(--blk);">Plumbing Maintenance</div>
+            <span style="font-size:10px; font-weight:700; background:#E6F4EA; color:#1E7E34; padding:2px 8px; border-radius:12px;">Completed</span>
+          </div>
+          <div style="font-size:11px; color:var(--gray); margin-top:4px;">Provider: Bilal Ahmed · May 14, 2026</div>
+          <div style="font-size:13px; font-weight:800; color:var(--blk); margin-top:8px;">Rs 850</div>
+        </div>
+        <div style="background:var(--lgray); border-radius:18px; padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div style="font-size:13px; font-weight:700; color:var(--blk);">Electrical Repair</div>
+            <span style="font-size:10px; font-weight:700; background:#FCE8E6; color:#C5221F; padding:2px 8px; border-radius:12px;">Cancelled</span>
+          </div>
+          <div style="font-size:11px; color:var(--gray); margin-top:4px;">Provider: Tariq & Co. · May 08, 2026</div>
+          <div style="font-size:13px; font-weight:800; color:var(--blk); margin-top:8px;">Rs 1,200</div>
+        </div>
+      `;
+      return;
+    }
+    
+    bookings.forEach(b => {
+      const isCompleted = b.status === 'completed';
+      const statusColor = isCompleted ? '#1E7E34' : (b.status === 'cancelled' ? '#C5221F' : 'var(--yd)');
+      const statusBg = isCompleted ? '#E6F4EA' : (b.status === 'cancelled' ? '#FCE8E6' : 'var(--ylight)');
+      
+      const bDiv = document.createElement('div');
+      bDiv.style.background = 'var(--lgray)';
+      bDiv.style.padding = '14px';
+      bDiv.style.borderRadius = '18px';
+      bDiv.style.marginBottom = '8px';
+      bDiv.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div style="font-size:13px; font-weight:700; color:var(--blk);">${b.serviceType}</div>
+          <span style="font-size:10px; font-weight:700; background:${statusBg}; color:${statusColor}; padding:2px 8px; border-radius:12px;">${b.status.toUpperCase()}</span>
+        </div>
+        <div style="font-size:11px; color:var(--gray); margin-top:4px;">Booking ID: #${b.id.substring(0,8)} · ${new Date(b.createdAt).toLocaleDateString()}</div>
+        <div style="font-size:13px; font-weight:800; color:var(--blk); margin-top:8px;">Rs ${b.totalEstimate}</div>
+      `;
+      bhList.appendChild(bDiv);
+    });
+    
+  } catch (err) {
+    console.error(err);
+    bhList.innerHTML = '<div style="padding:20px; text-align:center; font-size:12px; color:var(--gray);">Error fetching bookings. Displaying cached history.</div>';
+  }
+}
+
+// 5. Support & Help Functions
+function openSupportHelp() {
+  document.getElementById('sh-desc').value = '';
+  document.getElementById('sh-desc').classList.remove('err');
+  document.getElementById('sh-descerr').classList.remove('on');
+  
+  document.getElementById('supportHelpMod').classList.add('open');
+}
+
+function submitSupportTicket() {
+  const desc = document.getElementById('sh-desc').value.trim();
+  
+  if (desc.length < 10) {
+    document.getElementById('sh-desc').classList.add('err');
+    document.getElementById('sh-descerr').classList.add('on');
+    return;
+  }
+  
+  document.getElementById('sh-desc').classList.remove('err');
+  document.getElementById('sh-descerr').classList.remove('on');
+  
+  tst('Support Ticket Raised', 'Ticket #' + Math.floor(1000 + Math.random()*9000) + ' created successfully');
+  document.getElementById('supportHelpMod').classList.remove('open');
+}
+
+// 6. Settings Functions
+function openSettings() {
+  const notify = localStorage.getItem('settings_notify') !== 'false';
+  const location = localStorage.getItem('settings_location') !== 'false';
+  const simulatedDark = document.body.classList.contains('dark-sim');
+  const code = localStorage.getItem('demo_code') || (localStorage.getItem('role') === 'provider' ? 'PROV-2026' : 'USER-2026');
+  
+  document.getElementById('set-notify').checked = notify;
+  document.getElementById('set-location').checked = location;
+  document.getElementById('set-dark').checked = simulatedDark;
+  document.getElementById('set-code').value = code;
+  
+  document.getElementById('set-code').classList.remove('err');
+  document.getElementById('set-codeerr').classList.remove('on');
+  
+  document.getElementById('settingsMod').classList.add('open');
+}
+
+function toggleDarkSim(el) {
+  if (el.checked) {
+    document.body.classList.add('dark-sim');
+    if (!document.getElementById('dark-sim-style')) {
+      const style = document.createElement('style');
+      style.id = 'dark-sim-style';
+      style.innerHTML = `
+        .dark-sim .phone { background: #1A1A1A !important; border-color: #333 !important; }
+        .dark-sim .phone .c-hdr, .dark-sim .phone .bnav, .dark-sim .phone .prfhero, .dark-sim .phone .mgrp { background: #262626 !important; border-color: #333 !important; }
+        .dark-sim .phone .mlbl, .dark-sim .phone h3, .dark-sim .phone .prfnm, .dark-sim .phone .sht-ttl { color: #FFF !important; }
+        .dark-sim .phone .mi:active { background: #333 !important; }
+        .dark-sim .phone .sht { background: #262626 !important; color: #FFF; }
+        .dark-sim .phone .flbl { color: #AAA !important; }
+        .dark-sim .phone .finp { background: #333 !important; color: #FFF !important; }
+      `;
+      document.head.appendChild(style);
+    }
+  } else {
+    document.body.classList.remove('dark-sim');
+  }
+}
+
+function saveSettings() {
+  const notify = document.getElementById('set-notify').checked;
+  const location = document.getElementById('set-location').checked;
+  const code = document.getElementById('set-code').value.trim();
+  
+  if (code.length < 4) {
+    document.getElementById('set-code').classList.add('err');
+    document.getElementById('set-codeerr').classList.add('on');
+    return;
+  }
+  
+  localStorage.setItem('settings_notify', notify);
+  localStorage.setItem('settings_location', location);
+  localStorage.setItem('demo_code', code);
+  
+  tst('Settings Saved', 'App preferences updated');
+  document.getElementById('settingsMod').classList.remove('open');
+}
+
+// God Mode Simulation Panel
 function openGM(){document.getElementById('gmmod').classList.add('open');}
 function injectlogs(){
   document.getElementById('term').style.display='block';
@@ -712,22 +1916,29 @@ function showprovs(){
 }
 function ffenroute(){
   document.getElementById('gmmod').classList.remove('open');
-  tst('Provider is on the way!','Usman Khan · 8 min ETA');
-  setTimeout(()=>go('tracker'),700);
+  if (currentBooking) {
+    updateProviderJobStatus(currentBooking.id, 'en_route').then(() => {
+      go('tracker');
+      updateTrackerUI('en_route');
+    });
+  } else {
+    tst('Demo Status','No active booking to fast forward');
+  }
 }
 function ffcomplete(){
   document.getElementById('gmmod').classList.remove('open');
-  go('tracker');
-  setTimeout(()=>document.getElementById('revmod').classList.add('open'),400);
+  if (currentBooking) {
+    updateProviderJobStatus(currentBooking.id, 'completed').then(() => {
+      go('tracker');
+      updateTrackerUI('completed');
+      setTimeout(() => document.getElementById('revmod').classList.add('open'), 600);
+    });
+  } else {
+    tst('Demo Status','No active booking to fast forward');
+  }
 }
-function sendm(){
-  const ci=document.getElementById('ci');
-  if(!ci.value.trim())return;
-  const cb=document.getElementById('cbody');
-  const b=document.createElement('div');
-  b.className='bbl me';b.textContent=ci.value;
-  cb.appendChild(b);ci.value='';cb.scrollTop=cb.scrollHeight;
-}
+
+// Toast Notification
 let tt;
 function tst(ttl,msg){
   const el=document.getElementById('toastel');
@@ -737,5 +1948,6 @@ function tst(ttl,msg){
   clearTimeout(tt);
   tt=setTimeout(()=>el.classList.remove('on'),3000);
 }
+
 go('splash');
 </script>
