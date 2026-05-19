@@ -1,0 +1,1 @@
+// Zustand: Dedicated store for streaming Agent internal monologue

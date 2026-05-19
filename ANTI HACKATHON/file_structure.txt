@@ -1,0 +1,104 @@
+Folder PATH listing
+Volume serial number is 00000009 640E:BCEA
+C:.
+|   app.json
+|   babel.config.js
+|   global.css
+|   metro.config.js
+|   nativewind-env.d.ts
+|   package.json
+|   tailwind.config.js
+|   tsconfig.json
+|   
++---app
+|   |   index.tsx
+|   |   _layout.tsx
+|   |   
+|   +---auth
+|   |       login.tsx
+|   |       signup.tsx
+|   |       _layout.tsx
+|   |       
+|   \---main
+|           chat.tsx
+|           demo-logs.tsx
+|           provider.tsx
+|           tracker.tsx
+|           _layout.tsx
+|           
++---backend
+|   |   .env
+|   |   agent_trace.py
+|   |   intent_parser.py
+|   |   main.py
+|   |   orchestrator.py
+|   |   requirements.txt
+|   |   review_processor.py
+|   |   
+|   +---agents
+|   |       booking_agent.py
+|   |       dispute_agent.py
+|   |       intent_agent.py
+|   |       matching_agent.py
+|   |       orchestrator.py
+|   |       pricing_agent.py
+|   |       
+|   +---data
+|   |       bookings.json
+|   |       providers.json
+|   |       
+|   +---tools
+|   |       maps_tool.py
+|   |       notify_tool.py
+|   |       sheets_tool.py
+|   |       
+|   +---utils
+|   |       scoring.py
+|   |       streaming.py
+|   |       
+|   \---__pycache__
+|           intent_parser.cpython-313.pyc
+|           main.cpython-313.pyc
+|           orchestrator.cpython-313.pyc
+|           review_processor.cpython-313.pyc
+|           
+\---src
+    +---api
+    |       antigravity.ts
+    |       
+    +---assets
+    |   +---fonts
+    |   \---images
+    +---components
+    |   +---admin
+    |   |       GodModePanel.tsx
+    |   |       SimulationToast.tsx
+    |   |       
+    |   +---booking
+    |   |       DynamicQuoteModal.tsx
+    |   |       MockReceiptModal.tsx
+    |   |       ProviderCarousel.tsx
+    |   |       
+    |   +---chat
+    |   |       AgentTerminal.tsx
+    |   |       MessageBubble.tsx
+    |   |       ServiceCard.tsx
+    |   |       
+    |   \---tracker
+    |           ReviewModal.tsx
+    |           StepperTracker.tsx
+    |           
+    +---data
+    |       mockAgentLogs.ts
+    |       mockProviders.ts
+    |       
+    +---store
+    |       useAgentStore.ts
+    |       useAppStore.ts
+    |       
+    +---types
+    |       index.ts
+    |       
+    \---utils
+            dateUtils.ts
+            distanceCalc.ts
