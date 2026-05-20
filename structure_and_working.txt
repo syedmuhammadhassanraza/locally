@@ -1,0 +1,98 @@
+========================================================================
+                      ROZGO APP - FILE STRUCTURE & ARCHITECTURE
+========================================================================
+
+Below is the complete local directory structure of the Rozgo application, followed by a comprehensive explanation of the architecture, key algorithms, and structural mechanics that make the platform a production-ready, hackathon-level solution.
+
+------------------------------------------------------------------------
+1. COMPLETE DIRECTORY TREE
+------------------------------------------------------------------------
+
+ANTI HACKATHON/
+├── index.html                   # The complete premium, single-page client interface
+├── README.md                    # Primary repository documentation for GitHub
+├── serve.js                     # Root-level utility server
+├── structure_and_working.txt    # This file (Structure and architectural overview)
+├── antigravity_trace.txt        # Detailed log trace and prompts file
+├── app/                         # Secondary React Native / Expo structural files
+│   ├── _layout.tsx
+│   ├── index.tsx
+│   ├── auth/
+│   └── main/
+└── locally-backend/             # Unified backend server folder
+    ├── server.js                # Core entrypoint (TiDB auto-migrations and listening)
+    ├── package.json             # NPM metadata and configuration
+    ├── package-lock.json
+    ├── .env                     # Local environment keys (TiDB access credentials)
+    ├── config/
+    │   └── db.js                # Sequelize connection config for remote TiDB
+    ├── middleware/
+    │   └── auth.middleware.js   # JWT route security and user role verification
+    ├── models/                  # Sequelize SQL schemas for TiDB Database
+    │   ├── index.js             # Model associations & initializations
+    │   ├── user.model.js        # Strict CNIC validation & coordinates schema
+    │   ├── provider.model.js    # Reliable score and matching coordinates schema
+    │   ├── booking.model.js     # Pricing, complexity metrics and scheduledTime column
+    │   ├── review.model.js      # Customer feedback and rating data relations
+    │   ├── chat.model.js
+    │   └── payment.model.js
+    ├── controllers/             # API request routing controllers
+    │   ├── auth.controller.js   # Separate user/provider signups with 13-digit validations
+    │   ├── user.controller.js   # Profile details & CNIC persistence checks
+    │   ├── provider.controller.js # Verified professionals lookup endpoints
+    │   ├── chat.controller.js   # Smart matching controller (triggers AI service intents)
+    │   ├── booking.controller.js # Confirms reservations and updates provider GPS rows
+    │   ├── tracker.controller.js # Real-time tracking data poll endpoint
+    │   ├── review.controller.js # Captures post-service reviews and feedback scores
+    │   └── payment.controller.js
+    ├── routes/                  # Express REST Endpoint routers
+    │   ├── auth.routes.js
+    │   ├── user.routes.js
+    │   ├── provider.routes.js
+    │   ├── chat.routes.js
+    │   ├── booking.routes.js
+    │   ├── tracker.routes.js
+    │   └── review.routes.js
+    └── services/                # Specialized logic orchestrators
+        ├── ai.service.js        # Gemini NLP parser & rule-based Urdu fallback matcher
+        ├── matching.service.js  # Dynamic coordinates filtering & nearby recommendations
+        ├── pricing.service.js   # Complexity-tier and surge pricing modifiers
+        ├── maps.service.js
+        ├── sms.service.js
+        └── notification.service.js
+
+------------------------------------------------------------------------
+2. DETAILED APP ARCHITECTURE & WORKING MECHANICS
+------------------------------------------------------------------------
+
+The Rozgo App utilizes a state-of-the-art hybrid monolithic-microservice flow. Below is the step-by-step breakdown of how the client front-end interacts with the Node.js/TiDB backend:
+
+A. Dual Auth Portal & Strict Identity Rules
+- **Working:** The application provides a customized login interface to divide User (Consumer) and Provider (Service Professional) workspaces. Consumers use code `USER-2026` and Providers use code `PROV-2026`.
+- **Valuation Rules:** In sign-up and edit modes, the CNIC field is evaluated on both front-end (real-time color indicators) and back-end (Regex verification) to ensure it contains exactly 13 digits (numeric only, no dashes or symbols).
+
+B. Active GPS Pin Sync
+- **Working:** Upon consumer dashboard load, the app automatically fetches the real browser GPS coordinates via the HTML5 Geolocation API and saves them in the client's `localStorage` as the baseline position.
+- **Visuals:** The "GPS Pin 📍" button permits a manual refresh of coordinates, instantly updating the text location tag (e.g. "Satellite Town, Rawalpindi") and dynamically updates the central Google Map center.
+
+C. LLM-Powered Chat Matchmaking (The Antigravity Engine)
+- **Urdu/English Hybrid Processing:** The user enters a natural request (e.g. "nalleakage hai kitchen me"). The client issues a `/api/chat` request passing the input and the user's active lat/lng.
+- **Gemini NLP Interpretation:** The `ai.service.js` utilizes Google Gemini AI (`gemini-2.5-flash`) to parse the text. It analyzes Roman Urdu, Urdu Unicode, and English to identify the primary category (e.g., Plumbing), calculate an urgency score (1.0-10.0), flag the complexity tier (basic, standard, complex), and format a valid JSON response. A regex-based Urdu/Roman keyword parser acts as an instantaneous offline fallback.
+- **Dynamic 2-3km Radial Shifting:** Once a category is identified, the backend matches online providers. To deliver highly interactive, realistic maps, a coordinate projection shifter shifts the provider coordinates dynamically to be located **exactly 1.5 to 2.8 km** away from the user's current GPS location.
+- **Auto-Display Portfolio popup:** The matched results return to the client. The frontend automatically opens the details modal (`#qmod`) for the top recommended professional, showing their name, service tier, reliable score, and previous feedback list dynamically.
+
+D. Side-by-Side Decision Flow & Database Synchronization
+- **Working:** The user can tap **Accept ✓** or **Reject ✕**.
+- **Accept (Sync):** If the user accepts, the front-end sends a POST to `/api/bookings` containing the selected provider's exact shifted coordinates (`lat` and `lng`). The backend `createBooking` controller updates the provider's database coordinates on the remote TiDB database, ensuring that the tracking coordinate state persists permanently in the cloud.
+- **Reject (Auto-Fallback):** If the user rejects, the system automatically runs a reassignment loop, fetching the next closest provider, and presenting them to the user.
+
+E. Ultra-Smooth Gliding Tracker Animation (20Hz loop)
+- **Flicker-Free Setup:** The live tracking screen (`#tracker`) initializes the Map, home marker, and route polyline exactly once to ensure zero map jumps or reloads.
+- **Easing Interpolation:** A high-frequency timer loop runs every 50ms (20 frames per second). It mathematically interpolates the provider marker coordinates towards the user's green marker using an easing factor (`0.05`). This gives a high-fidelity visual of a vehicle smoothly driving along the streets in real-time.
+
+F. Resilient database schemas
+- **Working:** All models are synchronized with the TiDB Cloud Server. Dynamic startup migrations inside `server.js` automatically sync missing fields (such as `complexityTier`, `cancellationFee`, `checklist`, `evidencePhotos`, and `scheduledTime` in `Bookings`) so that database interactions are entirely error-free and scalable.
+
+========================================================================
+                  DESIGNED FOR HACKATHON EXCELLENCE
+========================================================================
