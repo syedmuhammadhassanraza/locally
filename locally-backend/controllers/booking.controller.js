@@ -1,8 +1,16 @@
 const { Booking, User, Provider, Chat } = require('../models');
 
 const createBooking = async (req, res) => {
-  const { providerId, serviceType, baseFee, travelFee, surgeFee, totalEstimate } = req.body;
+  const { providerId, serviceType, baseFee, travelFee, surgeFee, totalEstimate, lat, lng } = req.body;
   try {
+    // Update provider coordinates to reflect the shifted matched location in database
+    if (providerId && lat && lng) {
+      await Provider.update(
+        { lat: parseFloat(lat), lng: parseFloat(lng) },
+        { where: { id: providerId } }
+      );
+    }
+
     const booking = await Booking.create({
       consumerId: req.user.id,
       providerId,
@@ -64,4 +72,55 @@ const updateBookingStatus = async (req, res) => {
   }
 };
 
-module.exports = { createBooking, getBookings, updateBookingStatus };
+const reassignBooking = async (req, res) => {
+  const { id } = req.params;
+  const { Op } = require('sequelize');
+
+  try {
+    const booking = await Booking.findByPk(id);
+    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+    // Find a next available provider in this service category who is NOT the current one
+    const nextProvider = await Provider.findOne({
+      where: {
+        serviceType: booking.serviceType,
+        isOnline: true,
+        id: { [Op.ne]: booking.providerId }
+      }
+    });
+
+    if (!nextProvider) {
+      // Dynamic fallback/simulation provider so demo never gets stuck!
+      const fallbackProvider = await Provider.create({
+        name: 'Bilal Ahmed',
+        fathersName: 'Ahmed Raza',
+        email: 'bilal_' + Date.now() + '@rozgo.com',
+        phone: '03009876543',
+        address: 'PWD Colony, Islamabad',
+        demoCode: 'PROV-2026-FALLBACK',
+        serviceType: booking.serviceType,
+        isOnline: true,
+        rating: 4.6,
+        jobsCompleted: 142,
+        reliabilityScore: 95
+      });
+
+      booking.providerId = fallbackProvider.id;
+      booking.status = 'confirmed';
+      await booking.save();
+
+      return res.json({ success: true, booking, provider: fallbackProvider });
+    }
+
+    booking.providerId = nextProvider.id;
+    booking.status = 'confirmed';
+    await booking.save();
+
+    return res.json({ success: true, booking, provider: nextProvider });
+  } catch (error) {
+    console.error('reassignBooking error:', error);
+    return res.status(500).json({ message: 'Server error during provider reassignment' });
+  }
+};
+
+module.exports = { createBooking, getBookings, updateBookingStatus, reassignBooking };

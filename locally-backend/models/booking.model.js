@@ -30,6 +30,26 @@ const Booking = sequelize.define('Booking', {
   totalEstimate: {
     type: DataTypes.FLOAT,
     defaultValue: 0.0
+  },
+  complexityTier: {
+    type: DataTypes.STRING,
+    defaultValue: 'basic'  // basic, standard, complex
+  },
+  scheduledTime: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  cancellationFee: {
+    type: DataTypes.FLOAT,
+    defaultValue: 0.0
+  },
+  checklist: {
+    type: DataTypes.JSON,
+    defaultValue: []
+  },
+  evidencePhotos: {
+    type: DataTypes.JSON,
+    defaultValue: []
   }
 });
 

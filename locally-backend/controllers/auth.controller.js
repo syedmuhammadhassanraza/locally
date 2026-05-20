@@ -8,7 +8,7 @@ const generateToken = (id, role) => {
 };
 
 const registerUser = async (req, res) => {
-  const { name, fathersName, email, role, cnic } = req.body;
+  const { name, fathersName, email, role, cnic, phone, dob, address, lat, lng } = req.body;
   try {
     if (role === 'provider') {
       let provider = await Provider.findOne({ where: { email } });
@@ -21,6 +21,11 @@ const registerUser = async (req, res) => {
         fathersName,
         email,
         cnic,
+        phone,
+        dob,
+        address,
+        lat: lat || 33.6425,
+        lng: lng || 73.0768,
         demoCode: 'PROV-2026',
         serviceType: 'Plumbing',
         isOnline: true
@@ -41,6 +46,12 @@ const registerUser = async (req, res) => {
         name,
         fathersName,
         email,
+        phone,
+        dob,
+        address,
+        cnic,
+        lat: lat || 33.6425,
+        lng: lng || 73.0768,
         demoCode: 'USER-2026'
       });
 
@@ -62,17 +73,44 @@ const loginUser = async (req, res) => {
 
   try {
     if (loginCode === 'PROV-2026') {
+      // Try to find by demoCode first, then by email fallback
       let provider = await Provider.findOne({ where: { demoCode: 'PROV-2026' } });
+      if (!provider && email) {
+        provider = await Provider.findOne({ where: { email } });
+      }
       if (!provider) {
-        provider = await Provider.create({
-          name: 'Tariq Mehmood',
-          fathersName: 'Mehmood Khan',
-          email: email || 'tariq@example.com',
-          cnic: '37405-1234567-1',
-          demoCode: 'PROV-2026',
-          serviceType: 'Plumbing',
-          isOnline: true
-        });
+        // Create with provided email or default
+        const provEmail = email || `provider_demo_${Date.now()}@locally.pk`;
+        try {
+          provider = await Provider.create({
+            name: 'Tariq Mehmood',
+            fathersName: 'Mehmood Khan',
+            email: provEmail,
+            cnic: '37405-1234567-1',
+            phone: '0300-1234567',
+            address: 'Rawalpindi, Punjab',
+            lat: 33.6425,
+            lng: 73.0768,
+            demoCode: 'PROV-2026',
+            serviceType: 'Plumbing',
+            isOnline: true
+          });
+        } catch (createErr) {
+          // If email conflict, try with timestamp email
+          provider = await Provider.create({
+            name: 'Tariq Mehmood',
+            fathersName: 'Mehmood Khan',
+            email: `provider_${Date.now()}@locally.pk`,
+            cnic: '37405-1234567-1',
+            phone: '0300-1234567',
+            address: 'Rawalpindi, Punjab',
+            lat: 33.6425,
+            lng: 73.0768,
+            demoCode: 'PROV-2026',
+            serviceType: 'Plumbing',
+            isOnline: true
+          });
+        }
       }
       return res.json({
         token: generateToken(provider.id, 'provider'),

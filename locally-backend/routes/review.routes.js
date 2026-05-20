@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { submitReview } = require('../controllers/review.controller');
+const { createReview, getReviewsByProvider } = require('../controllers/review.controller');
 const { protect } = require('../middleware/auth.middleware');
 
-router.use(protect);
-router.post('/', submitReview);
+// Protect creation, but allow viewing of reviews publicly
+router.post('/', protect, createReview);
+router.get('/provider/:providerId', getReviewsByProvider);
 
 module.exports = router;

@@ -1,38 +1,68 @@
-const { Review, Booking, Provider } = require('../models');
+const { Review, Provider, Booking, User } = require('../models');
 
-const submitReview = async (req, res) => {
-  const { bookingId, rating, comment } = req.body;
+const createReview = async (req, res) => {
+  const { bookingId, rating, feedback, comment } = req.body;
+  const actualFeedback = feedback || comment;
+  const consumerId = req.user.id;
+
   try {
-    const booking = await Booking.findByPk(bookingId);
+    if (!bookingId || !rating || !actualFeedback) {
+      return res.status(400).json({ message: 'Missing required fields: bookingId, rating, feedback/comment' });
+    }
+
+    const booking = await Booking.findByPk(bookingId, {
+      include: [{ model: User, as: 'consumer' }]
+    });
+
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
+    const providerId = booking.providerId;
+    const consumerName = booking.consumer ? booking.consumer.name : 'Anonymous Consumer';
+
     const review = await Review.create({
       bookingId,
-      consumerId: req.user.id,
-      providerId: booking.providerId,
-      rating: parseInt(rating) || 5,
-      comment: comment || ''
+      providerId,
+      consumerId,
+      rating: parseInt(rating),
+      feedback: actualFeedback,
+      consumerName
     });
 
-    // Recalculate provider average rating and increment statistics
-    const provider = await Provider.findByPk(booking.providerId);
-    if (provider) {
-      const allReviews = await Review.findAll({ where: { providerId: provider.id } });
-      const avgRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+    // Recalculate average rating for the provider
+    const providerReviews = await Review.findAll({ where: { providerId } });
+    if (providerReviews.length > 0) {
+      const sum = providerReviews.reduce((acc, r) => acc + r.rating, 0);
+      const avg = parseFloat((sum / providerReviews.length).toFixed(1));
       
-      provider.rating = parseFloat(avgRating.toFixed(1));
-      provider.jobsCompleted = (provider.jobsCompleted || 0) + 1;
-      provider.earnings = (provider.earnings || 0.0) + (booking.totalEstimate || 0.0);
-      await provider.save();
+      await Provider.update(
+        { rating: avg, jobsCompleted: providerReviews.length },
+        { where: { id: providerId } }
+      );
     }
 
-    return res.status(201).json(review);
+    return res.status(201).json({ message: 'Review submitted successfully', review });
   } catch (error) {
-    console.error('Review controller error:', error);
-    return res.status(500).json({ message: 'Server error submitting review' });
+    console.error('createReview error:', error);
+    return res.status(500).json({ message: 'Server error while submitting review' });
   }
 };
 
-module.exports = { submitReview };
+const getReviewsByProvider = async (req, res) => {
+  const { providerId } = req.params;
+
+  try {
+    const reviews = await Review.findAll({
+      where: { providerId },
+      order: [['createdAt', 'DESC']]
+    });
+
+    return res.json(reviews);
+  } catch (error) {
+    console.error('getReviewsByProvider error:', error);
+    return res.status(500).json({ message: 'Server error while fetching reviews' });
+  }
+};
+
+module.exports = { createReview, getReviewsByProvider };

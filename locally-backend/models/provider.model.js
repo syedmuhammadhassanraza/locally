@@ -50,11 +50,43 @@ const Provider = sequelize.define('Provider', {
   },
   lat: {
     type: DataTypes.FLOAT,
-    defaultValue: 33.6844 // Default coordinates for Rawalpindi/Islamabad region
+    defaultValue: 33.6844
   },
   lng: {
     type: DataTypes.FLOAT,
     defaultValue: 73.0479
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  address: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  dob: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  reliabilityScore: {
+    type: DataTypes.FLOAT,
+    defaultValue: 100.0
+  },
+  cancellationRate: {
+    type: DataTypes.FLOAT,
+    defaultValue: 0.0
+  },
+  hourlyRate: {
+    type: DataTypes.INTEGER,
+    defaultValue: 800
+  },
+  specialization: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  tier: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1  // 1=Basic, 2=Standard, 3=Complex
   }
 });
 

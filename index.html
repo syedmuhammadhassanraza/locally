@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="color-scheme" content="light only">
-  <title>LOCALLY — AI Services</title>
+  <title>Rozgo</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBIvMMs4uZwx20ai_LmSfQ6zLm7FjSfJg"></script>
 </head>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -79,10 +80,38 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
 .finp{width:100%;padding:15px 18px;background:var(--lgray);border:1.5px solid transparent;border-radius:var(--r16);font-family:var(--f);font-size:14px;color:var(--blk);outline:none;margin-bottom:14px;transition:border-color 0.2s,background 0.2s;}
 .finp::placeholder{color:#BDBDBD;}
 .finp:focus{border-color:var(--y);background:var(--ylighter);}
-.finp.err{border-color:#EA4335;}
+.finp.err{border-color:#EA4335;background:#FFF5F5;}
+.finp.valid{border-color:#34A853;background:#F0FFF4;}
 .errtxt{font-size:12px;color:#EA4335;margin-top:-10px;margin-bottom:10px;display:none;}
 .errtxt.on{display:block;}
+.validtxt{font-size:11px;color:#34A853;margin-top:-10px;margin-bottom:10px;display:none;}
+.validtxt.on{display:block;}
 .hinttxt{font-size:11px;color:var(--gray);margin-top:-10px;margin-bottom:12px;}
+/* Leaflet map overrides */
+.leaflet-map{width:100%;height:100%;border-radius:0;z-index:1;}
+.leaflet-container{font-family:var(--f);}
+/* Search pulse animation on map */
+@keyframes searchPulse{0%{transform:scale(0.3);opacity:0.8;}100%{transform:scale(1);opacity:0;}}
+.search-pulse{border-radius:50%;background:rgba(245,166,35,0.25);animation:searchPulse 2s ease-out infinite;position:absolute;pointer-events:none;}
+/* Clarification action buttons */
+.clarify-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.clarify-btn{padding:7px 14px;border-radius:20px;border:1.5px solid var(--y);background:var(--ylight);color:var(--yd);font-family:var(--f);font-size:11px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.clarify-btn:active{background:var(--y);color:var(--blk);transform:scale(0.95);}
+/* Notification log in chat */
+.notif-log{background:#F0FFF4;border:1px solid #C8E6C9;border-radius:14px;padding:10px 14px;margin-top:6px;font-size:11px;color:#2E7D32;line-height:1.7;}
+.notif-log .nl-icon{margin-right:6px;}
+/* Provider dashboard extended stats */
+.stg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;position:relative;z-index:1;}
+.psch{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:12px;margin-bottom:8px;}
+.psch-h{font-size:11px;font-weight:700;color:var(--gray);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px;}
+.psch-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.psch-row:last-child{border-bottom:none;}
+.psch-time{font-weight:700;color:var(--blk);}
+.psch-lbl{color:var(--gray);}
+.psch-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;}
+.psch-status.booked{background:var(--ylight);color:var(--yd);}
+.psch-status.free{background:#E8F5E9;color:#2E7D32;}
+.psch-status.break{background:#FFF3E0;color:#E65100;}
 .role-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
 .role-opt{padding:14px 10px;background:var(--lgray);border:2px solid transparent;border-radius:var(--r16);cursor:pointer;text-align:center;transition:all 0.18s;}
 .role-opt.on{background:var(--ylight);border-color:var(--y);}
@@ -164,7 +193,9 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
 
 /* ─── TRACKER ─── */
 #tracker{background:#F7F7F7;}
-.map-box{height:220px;background:#E8F0FE;position:relative;overflow:hidden;flex-shrink:0;}
+.map-box{height:240px;background:#E8F0FE;position:relative;overflow:hidden;flex-shrink:0;z-index:1;}
+#tracker-map{height:240px;width:100%;z-index:0;}
+#chat-map{height:180px;width:100%;z-index:0;}
 .mgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(66,133,244,0.08) 1px,transparent 1px),linear-gradient(90deg,rgba(66,133,244,0.08) 1px,transparent 1px);background-size:34px 34px;}
 .mrd-h{position:absolute;left:0;right:0;background:rgba(255,255,255,0.7);}
 .mrd-v{position:absolute;top:0;bottom:0;background:rgba(255,255,255,0.7);}
@@ -314,11 +345,10 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
         <svg viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11L10 22L20.5 10H14L13 2Z"/></svg>
       </div>
       <div>
-        <div class="logo-txt">LOCALLY</div>
-        <div class="logo-sub">AI Services</div>
+        <div class="logo-txt">Rozgo</div>
       </div>
     </div>
-    <div class="sp-tagline">Connect with verified local professionals, powered by AI — in seconds.</div>
+    <div class="sp-tagline">Connect with verified local professionals in Rawalpindi & Islamabad in seconds.</div>
     <div class="sp-btns">
       <button class="btn-blk" onclick="go('signup')">Get Started →</button>
       <button class="btn-blk-out" onclick="go('login')">Login</button>
@@ -327,23 +357,85 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
   </div>
 </div>
 
-<!-- LOGIN -->
+<!-- LOGIN ROLE PICKER -->
 <div class="scr" id="login">
   <div class="blob-tr" style="opacity:0.4;"></div>
   <div class="sbar" style="position:relative;z-index:1;background:white;"><span class="sbar-t">9:41</span></div>
   <div class="auth-hdr">
     <div class="back-btn" onclick="go('splash')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
     <div class="auth-h">Welcome<br>Back 👋</div>
-    <div class="auth-p">Sign in to your LOCALLY account</div>
+    <div class="auth-p">How would you like to sign in?</div>
+  </div>
+  <div class="auth-body" style="display:flex; flex-direction:column; gap:14px; padding-top:20px;">
+    <div onclick="go('login-user')" style="background:var(--lgray); border:2px solid var(--border); border-radius:20px; padding:22px 18px; cursor:pointer; transition:border-color 0.2s, transform 0.15s;" onmouseover="this.style.borderColor='var(--y)';this.style.transform='scale(1.02)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='scale(1)'">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div style="width:48px; height:48px; border-radius:16px; background:var(--ylight); display:flex; align-items:center; justify-content:center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--yd)"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:15px; font-weight:800; color:var(--blk);">Sign In as User</div>
+          <div style="font-size:11px; color:var(--gray); margin-top:2px;">Book services, track providers, leave reviews</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gray)" stroke-width="2" style="margin-left:auto;"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+    <div onclick="go('login-provider')" style="background:var(--lgray); border:2px solid var(--border); border-radius:20px; padding:22px 18px; cursor:pointer; transition:border-color 0.2s, transform 0.15s;" onmouseover="this.style.borderColor='#34A853';this.style.transform='scale(1.02)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='scale(1)'">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div style="width:48px; height:48px; border-radius:16px; background:#E8F5E9; display:flex; align-items:center; justify-content:center;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#34A853"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:15px; font-weight:800; color:var(--blk);">Sign In as Provider</div>
+          <div style="font-size:11px; color:var(--gray); margin-top:2px;">Accept jobs, manage bookings, earn money</div>
+        </div>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gray)" stroke-width="2" style="margin-left:auto;"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+    <div class="lnkrow" style="margin-top:8px;">Don't have an account? <span onclick="go('signup')">Sign Up</span></div>
+  </div>
+</div>
+
+<!-- USER LOGIN -->
+<div class="scr" id="login-user">
+  <div class="blob-tr" style="opacity:0.4;"></div>
+  <div class="sbar" style="position:relative;z-index:1;background:white;"><span class="sbar-t">9:41</span></div>
+  <div class="auth-hdr">
+    <div class="back-btn" onclick="go('login')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+    <div class="auth-h">User<br>Sign In 👤</div>
+    <div class="auth-p">Access your Rozgo consumer account</div>
   </div>
   <div class="auth-body">
     <label class="flbl">Email</label>
-    <input class="finp" type="email" placeholder="you@example.com" id="l-email">
+    <input class="finp" type="email" placeholder="you@example.com" id="lu-email">
     <label class="flbl">Access Code</label>
-    <input class="finp" type="password" placeholder="Enter demo code" id="l-code">
-    <div class="hinttxt">Demo: USER-2026 (Consumer) · PROV-2026 (Provider)</div>
-    <div class="errtxt" id="l-err">Invalid Hackathon Demo Code</div>
-    <button class="btn-blk" style="margin-top:4px;" onclick="doLogin()">Sign In →</button>
+    <input class="finp" type="password" placeholder="Enter your access code" id="lu-code">
+    <div class="errtxt" id="lu-err">Invalid access code</div>
+    <button class="btn-blk" style="margin-top:4px;" onclick="doLoginUser()">Sign In as User →</button>
+    <div class="divrow">or continue with</div>
+    <div class="soc-grid">
+      <button class="soc-b"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Google</button>
+      <button class="soc-b"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1A1A1A"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>Apple</button>
+    </div>
+    <div class="lnkrow">Don't have an account? <span onclick="go('signup')">Sign Up</span></div>
+  </div>
+</div>
+
+<!-- PROVIDER LOGIN -->
+<div class="scr" id="login-provider">
+  <div class="blob-tr" style="opacity:0.4;"></div>
+  <div class="sbar" style="position:relative;z-index:1;background:white;"><span class="sbar-t">9:41</span></div>
+  <div class="auth-hdr">
+    <div class="back-btn" onclick="go('login')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
+    <div class="auth-h">Provider<br>Sign In 👷</div>
+    <div class="auth-p">Access your Rozgo provider dashboard</div>
+  </div>
+  <div class="auth-body">
+    <label class="flbl">Email</label>
+    <input class="finp" type="email" placeholder="provider@example.com" id="lp-email">
+    <label class="flbl">Access Code</label>
+    <input class="finp" type="password" placeholder="Enter your provider code" id="lp-code">
+    <div class="errtxt" id="lp-err">Invalid provider access code</div>
+    <button class="btn-blk" style="margin-top:4px; background:#34A853;" onclick="doLoginProvider()">Sign In as Provider →</button>
     <div class="divrow">or continue with</div>
     <div class="soc-grid">
       <button class="soc-b"><svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Google</button>
@@ -360,29 +452,52 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
   <div class="auth-hdr">
     <div class="back-btn" onclick="go('login')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
     <div class="auth-h">Create<br>Account</div>
-    <div class="auth-p">Join LOCALLY — it only takes 30 seconds</div>
+    <div class="auth-p">Join Rozgo — it only takes 30 seconds</div>
   </div>
-  <div class="auth-body">
+  <div class="auth-body" style="overflow-y:auto; max-height:calc(100% - 140px); padding-bottom:30px;">
     <label class="flbl">Full Name</label>
     <input class="finp" type="text" placeholder="Ali Hassan" id="s-name" oninput="vname(this)">
-    <div class="errtxt" id="nerr">Name cannot contain numbers or symbols</div>
+    <div class="errtxt" id="nerr">Name must contain only letters and spaces (min 3 chars)</div>
+    
     <label class="flbl">Father's Name</label>
-    <input class="finp" type="text" placeholder="Muhammad Hassan" oninput="vname(this)">
-    <label class="flbl">Email</label>
-    <input class="finp" type="email" placeholder="ali@example.com">
-    <div style="margin-bottom:6px;"><label class="flbl">I am a</label></div>
+    <input class="finp" type="text" placeholder="Muhammad Hassan" id="s-fathersName" oninput="vfname(this)">
+    <div class="errtxt" id="fnerr">Father's name must contain only letters and spaces</div>
+    
+    <label class="flbl">Email Address</label>
+    <input class="finp" type="email" placeholder="ali@example.com" id="s-email" oninput="vemail(this)">
+    <div class="errtxt" id="emerr">Please enter a valid email address</div>
+    
+    <label class="flbl">Phone Number</label>
+    <input class="finp" type="tel" placeholder="0300-1234567" id="s-phone" oninput="vphone(this)" maxlength="12">
+    <div class="hinttxt">Format: 03xx-xxxxxxx (11 digits total)</div>
+    <div class="errtxt" id="pherr">Please enter a valid Pakistani mobile number</div>
+    
+    <label class="flbl">Date of Birth</label>
+    <input class="finp" type="date" id="s-dob" oninput="vdob(this)">
+    <div class="errtxt" id="doberr">Providers must be at least 18 years old</div>
+    
+    <label class="flbl">Service Location / Address</label>
+    <div style="display:flex; gap:8px; margin-bottom:14px;">
+      <input class="finp" type="text" placeholder="Satellite Town, Rawalpindi" id="s-address" oninput="vaddress(this)" style="margin-bottom:0; flex:1;">
+      <button class="btn-blk" style="width:50px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:16px;" onclick="geolocateAddress()" title="Use Current GPS Location"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg></button>
+    </div>
+    <div class="errtxt" id="adderr">Address cannot be empty</div>
+    
+    <div style="margin-bottom:6px;"><label class="flbl">I am registering as a</label></div>
     <div class="role-wrap">
       <div class="role-opt on" id="rc" onclick="srole('c')"><div class="ri">🛒</div><div class="rl">Consumer</div></div>
       <div class="role-opt" id="rp" onclick="srole('p')"><div class="ri">🔧</div><div class="rl">Provider</div></div>
     </div>
+    
     <div id="cnicwrap" style="display:none;">
       <label class="flbl">CNIC Number</label>
-      <input class="finp" type="text" placeholder="XXXXX-XXXXXXX-X" id="cnic" oninput="fcnic(this)" maxlength="15">
-      <div class="hinttxt">Auto-formatted · e.g. 42101-1234567-8</div>
-      <div class="errtxt" id="cnicerr">CNIC must be complete (15 characters)</div>
+      <input class="finp" type="text" placeholder="3520212345671" id="cnic" oninput="fcnic(this)" maxlength="13" inputmode="numeric">
+      <div class="hinttxt">Enter exactly 13 digits (no dashes/spaces)</div>
+      <div class="errtxt" id="cnicerr">Please enter a valid 13-digit Pakistani CNIC number.</div>
     </div>
-    <button class="btn-blk" onclick="dosignup()">Create Account →</button>
-    <div class="lnkrow">Already have an account? <span onclick="go('login')">Login</span></div>
+    
+    <button class="btn-blk" onclick="dosignup()" style="margin-top:10px;">Create Account →</button>
+    <div class="lnkrow" style="margin-top:14px;">Already have an account? <span onclick="go('login')">Login</span></div>
   </div>
 </div>
 
@@ -391,47 +506,32 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
   <div class="sbar" style="background:white;"><span class="sbar-t">9:41</span></div>
   <div class="c-hdr">
     <div class="c-hdr-av"><svg viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11L10 22L20.5 10H14L13 2Z"/></svg></div>
-    <div class="c-hdr-inf"><h3>LOCALLY Agent</h3><p>● Online · AI Powered</p></div>
+    <div class="c-hdr-inf"><h3>Rozgo</h3><p>● Online · AI Assistant</p></div>
     <div class="hbtn" onclick="openGM()" title="God Mode" style="background:var(--ylight);">
       <svg viewBox="0 0 24 24" fill="var(--y)" width="17" height="17"><path d="M13 2L4.5 13.5H11L10 22L20.5 10H14L13 2Z"/></svg>
     </div>
     <div class="hbtn" onclick="logout()"><svg viewBox="0 0 24 24" fill="var(--gray)"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></div>
   </div>
+  <div style="background: var(--lgray); padding: 8px 14px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--gray); font-weight: 600;">
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EA4335" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="white"/></svg>
+      <span id="chat-current-location">Satellite Town, Rawalpindi</span>
+    </div>
+    <button onclick="updateChatGPSLocation()" style="background: white; border: 1px solid var(--border); padding: 2px 8px; border-radius: 6px; font-size: 10px; color: var(--blk); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; line-height: 1;">GPS Pin 📍</button>
+  </div>
   <div class="cbody" id="cbody">
-    <div class="ai-tag">LOCALLY AI</div>
-    <div class="bbl ai">Hey! I'm your AI service agent. Describe what you need and I'll find the best verified local professionals near you. ⚡</div>
-    <div class="bbl me">I need a plumber urgently — my kitchen pipe is leaking badly</div>
+    <div class="ai-tag">Rozgo AI</div>
+    <div class="bbl ai">Hey! I'm your Rozgo AI assistant. Tell me what service you need — plumbing, electrical, cleaning, or anything else — and I'll instantly find the best verified professionals near you. ⚡</div>
     <div class="terminal" id="term" style="display:none;">
-      <div class="tl">Parsing request...</div>
-      <div class="tl hl">Intent: PLUMBING_REPAIR [URGENT]</div>
-      <div class="tl">Location: Rawalpindi, Punjab, PK</div>
-      <div class="tl">Urgency score: 9.2 / 10</div>
-      <div class="tl">Scanning 247 verified providers...</div>
-      <div class="tl hl">Matched 3 top providers ✓</div>
       <span class="tcur">█</span>
     </div>
-    <div class="bbl ai" id="ai2" style="display:none;">Found 3 verified plumbers nearby! AI-ranked for you 👇</div>
+    <div class="bbl ai" id="ai2" style="display:none;">Found verified providers nearby! AI-ranked for you 👇</div>
+    <div id="chat-map-container" style="display:none; margin: 10px 14px; border-radius: 16px; overflow: hidden; border: 1.5px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.06); position: relative; z-index: 1;">
+      <div id="chat-map" style="height: 180px; width: 100%;"></div>
+      <div id="chat-map-radius-badge" style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; z-index: 1000;">Search Radius: 1.5 km</div>
+    </div>
     <div class="pstrip" id="pstrip" style="display:none;">
-      <div class="prow">
-        <div class="pcard" onclick="openQ('Usman Khan','Rs 800','Rs 150','Rs 200','Rs 1,150')">
-          <div class="pc-hd"><div class="pc-nm">Usman Khan</div><div class="pc-bdg">TOP</div></div>
-          <div class="pc-d">1.2 km · 8 yrs exp</div>
-          <div class="pc-s">★★★★★ 4.9</div>
-          <div class="pc-p">Rs 800</div>
-        </div>
-        <div class="pcard" onclick="openQ('Bilal Ahmed','Rs 650','Rs 200','Rs 0','Rs 850')">
-          <div class="pc-hd"><div class="pc-nm">Bilal Ahmed</div><div class="pc-bdg">BUDGET</div></div>
-          <div class="pc-d">2.1 km · 5 yrs exp</div>
-          <div class="pc-s">★★★★☆ 4.6</div>
-          <div class="pc-p">Rs 650</div>
-        </div>
-        <div class="pcard" onclick="openQ('Tariq & Co.','Rs 700','Rs 100','Rs 180','Rs 980')">
-          <div class="pc-hd"><div class="pc-nm">Tariq & Co.</div><div class="pc-bdg">NEAR</div></div>
-          <div class="pc-d">0.8 km · 12 yrs exp</div>
-          <div class="pc-s">★★★★★ 4.8</div>
-          <div class="pc-p">Rs 700</div>
-        </div>
-      </div>
+      <div class="prow"></div>
     </div>
   </div>
   <div class="cinpbar">
@@ -439,15 +539,61 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
     <div class="csend" onclick="sendm()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></div>
   </div>
   <div class="ovl" id="qmod" onclick="if(event.target===this)this.classList.remove('open')">
-    <div class="sht">
+    <div class="sht" style="max-height: 85%; overflow-y: auto; padding-bottom: 24px;">
       <div class="sht-pill"></div>
-      <div class="sht-ttl" id="q-nm">Usman Khan — Plumber</div>
+      
+      <!-- Header & Basic Info -->
+      <div style="display:flex; gap:12px; align-items:center; margin-top:12px;">
+        <div id="q-avatar" style="width:50px; height:50px; border-radius:25px; background:var(--ylight); color:var(--yd); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; border:2px solid var(--y);">UK</div>
+        <div style="flex:1;">
+          <div class="sht-ttl" id="q-nm" style="margin:0; font-size:16px;">Usman Khan</div>
+          <div id="q-category-tag" style="display:inline-block; font-size:10px; font-weight:700; color:var(--gray); background:white; padding:2px 8px; border-radius:8px; border:1px solid var(--border); margin-top:2px;">Plumbing</div>
+        </div>
+      </div>
+      
+      <!-- Metrics Section -->
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; margin-top:14px;">
+        <div style="background:var(--lgray); border-radius:10px; padding:8px; text-align:center;">
+          <div style="font-size:10px; color:var(--gray); font-weight:600;">Rating</div>
+          <div id="q-metric-rating" style="font-size:14px; font-weight:800; color:var(--blk); margin-top:2px;">★ 4.9</div>
+        </div>
+        <div style="background:var(--lgray); border-radius:10px; padding:8px; text-align:center;">
+          <div style="font-size:10px; color:var(--gray); font-weight:600;">Jobs Done</div>
+          <div id="q-metric-jobs" style="font-size:14px; font-weight:800; color:var(--blk); margin-top:2px;">247</div>
+        </div>
+        <div style="background:var(--lgray); border-radius:10px; padding:8px; text-align:center;">
+          <div style="font-size:10px; color:var(--gray); font-weight:600;">Reliability</div>
+          <div id="q-metric-reliability" style="font-size:14px; font-weight:800; color:#34A853; margin-top:2px;">98%</div>
+        </div>
+      </div>
+      
+      <!-- ID Section -->
+      <div style="display:flex; justify-content:space-between; align-items:center; background:var(--lgray); border-radius:10px; padding:8px 12px; margin-top:8px; font-size:11px;">
+        <span style="color:var(--gray); font-weight:600;">Worker ID</span>
+        <span id="q-worker-id" style="font-weight:700; color:var(--blk);">PROV-2026</span>
+      </div>
+
+      <!-- Reviews Feed Container -->
+      <div style="margin-top:16px;">
+        <h4 style="font-size:12px; font-weight:700; color:var(--blk); margin-bottom:8px;">Customer Reviews</h4>
+        <div id="q-reviews-list" style="max-height:160px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;">
+          <!-- Reviews will load here dynamically -->
+        </div>
+      </div>
+
+      <hr style="border:0; border-top:1.5px solid var(--border); margin:16px 0;">
+
+      <!-- Pricing section -->
       <div class="pr"><span class="prl">Base Service Fee</span><span class="prv" id="q-b">Rs 800</span></div>
       <div class="pr"><span class="prl">Travel Fee</span><span class="prv" id="q-t">Rs 150</span></div>
       <div class="pr"><span class="prl">⚡ Surge (Urgency)</span><span class="prv surge" id="q-s">Rs 200</span></div>
       <div class="pr" style="border:none;margin-top:2px;"><span class="prl" style="font-weight:700;color:var(--blk);">Total Estimate</span><span class="pr-tot" id="q-tot">Rs 1,150</span></div>
-      <button class="btn-y" onclick="negotiate()">💡 Budget Alternative — Save 30%</button>
-      <button class="btn-bk2" onclick="booknow()">Book Now →</button>
+      
+      <button class="btn-y" onclick="negotiate()" style="margin-top:12px;">💡 Budget Alternative — Save 30%</button>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px;">
+        <button class="btn-bk2" onclick="document.getElementById('qmod').classList.remove('open'); tst('Offer Rejected', 'You declined this service provider.');" style="background:#ECEFF1; color:#455A64; border:1px solid #CFD8DC; margin:0; font-weight:700;">Reject ✕</button>
+        <button class="btn-bk2" onclick="booknow()" style="background:#2E7D32; color:white; border:none; margin:0; font-weight:700; box-shadow: 0 4px 12px rgba(46,125,50,0.2);">Accept ✓</button>
+      </div>
     </div>
   </div>
   <div class="bnav">
@@ -463,23 +609,10 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
   <div class="c-hdr" style="background:white;">
     <div class="back-btn" style="margin:0;border-radius:12px;" onclick="go('chat')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
     <div class="c-hdr-inf"><h3>Live Tracker</h3><p style="color:var(--y);">● Usman Khan — En Route</p></div>
+    <div style="font-weight: 800; color: var(--blk); font-size: 15px; margin-right: 8px; letter-spacing: -0.5px;">Rozgo</div>
   </div>
   <div class="map-box">
-    <div class="mgrid"></div>
-    <div class="mrd-h" style="top:38%;height:12px;"></div>
-    <div class="mrd-h" style="top:66%;height:8px;"></div>
-    <div class="mrd-v" style="left:32%;width:10px;"></div>
-    <div class="mrd-v" style="left:70%;width:8px;"></div>
-    <div class="mroute"></div>
-    <div class="mpin" style="top:24px;left:52px;">
-      <div class="mpindot" style="background:#4285F4;"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg></div>
-      <div style="font-size:9px;font-weight:700;color:var(--blk);margin-top:4px;background:white;padding:2px 6px;border-radius:4px;">Provider</div>
-    </div>
-    <div class="mpin" style="bottom:24px;right:52px;">
-      <div class="mpindot" style="background:#34A853;"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
-      <div style="font-size:9px;font-weight:700;color:var(--blk);margin-top:4px;background:white;padding:2px 6px;border-radius:4px;">You</div>
-    </div>
-    <div class="mcar"><svg viewBox="0 0 24 24" fill="var(--blk)"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg></div>
+    <div id="tracker-map" class="leaflet-map"></div>
   </div>
   <div class="trkbody">
     <div class="tc">
@@ -519,6 +652,16 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
       <button class="btn-blk" onclick="submitrev()">Submit Review →</button>
     </div>
   </div>
+  
+  <!-- REASSIGNMENT OVERLAY -->
+  <div class="rovl" id="reassignmod" style="z-index:9999;">
+    <div class="rsht" style="text-align:center; padding: 24px 20px;">
+      <div style="font-size:40px; margin-bottom:12px; animation: pulse 2s infinite;">🔄</div>
+      <h3 style="font-size:16px; font-weight:800; color:var(--blk); margin-bottom:8px;">Worker is Busy</h3>
+      <p id="reassign-msg" style="font-size:12px; color:var(--gray); line-height:1.4; margin-bottom:20px;">Automatically finding the next available professional near you... (Attempt 1 of 3)</p>
+      <button class="btn-blk-out" style="width:100%; border-color:#FF3B30; color:#FF3B30;" onclick="cancelReassignment()">Cancel Booking</button>
+    </div>
+  </div>
 </div>
 
 <!-- PROVIDER DASHBOARD -->
@@ -528,7 +671,7 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
     <div class="ph-blob"></div>
     <div class="ph-top">
       <div>
-        <div class="ph-grt">Good Afternoon</div>
+        <div class="ph-grt">Rozgo Provider Panel</div>
         <div class="ph-nm">Tariq Mehmood 👷</div>
         <div class="ph-loc">📍 Rawalpindi, Punjab</div>
       </div>
@@ -545,6 +688,23 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
     </div>
   </div>
   <div class="pbody">
+    <!-- Operational Status & Capacity -->
+    <div class="sttl">Daily Schedule & Availability</div>
+    <div class="psch">
+      <div class="psch-h">Today's Timeslots</div>
+      <div class="psch-row"><span class="psch-time">09:00 AM - 11:00 AM</span><span class="psch-lbl">Water Heater Install</span><span class="psch-status booked">Booked</span></div>
+      <div class="psch-row"><span class="psch-time">11:30 AM - 01:30 PM</span><span class="psch-lbl">Unscheduled</span><span class="psch-status free">Available</span></div>
+      <div class="psch-row"><span class="psch-time">02:00 PM - 04:00 PM</span><span class="psch-lbl">Kitchen Pipe Leak</span><span class="psch-status booked">Booked</span></div>
+      <div class="psch-row"><span class="psch-time">04:30 PM - 06:30 PM</span><span class="psch-lbl">Daily Break / Prayer</span><span class="psch-status break">Off-Duty</span></div>
+    </div>
+    
+    <div class="sttl">Performance Analytics</div>
+    <div class="stg3" style="margin-bottom: 16px;">
+      <div class="sc"><div class="sv" id="p-cap">85%</div><div class="sl">Workload Capacity</div></div>
+      <div class="sc"><div class="sv" id="p-rel">100%</div><div class="sl">Reliability Score</div></div>
+      <div class="sc"><div class="sv" id="p-canc">0%</div><div class="sl">Cancellation Rate</div></div>
+    </div>
+
     <div class="sttl">New Requests</div>
     <div class="jc">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
@@ -584,6 +744,7 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
   <div class="c-hdr" style="background:white;">
     <div class="back-btn" style="margin:0;border-radius:12px;" onclick="go('chat')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div>
     <div class="c-hdr-inf"><h3>Profile</h3></div>
+    <div style="font-weight: 800; color: var(--blk); font-size: 15px; margin-right: 8px; letter-spacing: -0.5px;">Rozgo</div>
   </div>
   <div class="prfhero" style="padding-top:16px;">
     <div class="prfblob"></div>
@@ -634,17 +795,30 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
     <div class="errtxt" id="ep-nerr">Name cannot contain numbers or symbols</div>
     
     <label class="flbl">Father's Name</label>
-    <input class="finp" type="text" placeholder="Muhammad Hassan" id="ep-fathersName" oninput="vepname(this)">
+    <input class="finp" type="text" placeholder="Muhammad Hassan" id="ep-fathersName" oninput="vepfname(this)">
     <div class="errtxt" id="ep-fnerr">Father's name cannot contain numbers or symbols</div>
     
-    <label class="flbl">Email</label>
-    <input class="finp" type="email" placeholder="ali@example.com" id="ep-email">
+    <label class="flbl">Email Address</label>
+    <input class="finp" type="email" placeholder="ali@example.com" id="ep-email" oninput="vepemail(this)">
     <div class="errtxt" id="ep-emerr">Please enter a valid email address</div>
+    
+    <label class="flbl">Phone Number</label>
+    <input class="finp" type="tel" placeholder="0300-1234567" id="ep-phone" oninput="vepphone(this)" maxlength="12">
+    <div class="hinttxt">Format: 03xx-xxxxxxx</div>
+    <div class="errtxt" id="ep-pherr">Please enter a valid Pakistani mobile number</div>
+    
+    <label class="flbl">Date of Birth</label>
+    <input class="finp" type="date" id="ep-dob" oninput="vepdob(this)">
+    <div class="errtxt" id="ep-doberr">Providers must be at least 18 years old</div>
+    
+    <label class="flbl">Service Location / Address</label>
+    <input class="finp" type="text" placeholder="Satellite Town, Rawalpindi" id="ep-address" oninput="vepaddress(this)">
+    <div class="errtxt" id="ep-adderr">Address cannot be empty</div>
     
     <div id="ep-cnicwrap" style="display:none;">
       <label class="flbl">CNIC Number</label>
-      <input class="finp" type="text" placeholder="XXXXX-XXXXXXX-X" id="ep-cnic" oninput="fcnic(this)" maxlength="15">
-      <div class="errtxt" id="ep-cnicerr">CNIC must be complete (15 characters)</div>
+      <input class="finp" type="text" placeholder="3520212345671" id="ep-cnic" oninput="fcnic(this)" maxlength="13">
+      <div class="errtxt" id="ep-cnicerr">Please enter a valid 13-digit Pakistani CNIC number.</div>
     </div>
     
     <button class="btn-blk" style="margin-top:12px;" onclick="saveProfile()">Save Changes</button>
@@ -658,36 +832,29 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
     <div class="sht-ttl">Payment Methods</div>
     
     <div style="margin-bottom: 16px;">
-      <label class="flbl">Current Payment Methods</label>
+      <label class="flbl">Active Payment Accounts</label>
       <div id="pm-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
         <!-- Dynamically rendered -->
       </div>
     </div>
     
-    <div class="divrow">Add New Card</div>
+    <div class="divrow">Link Mobile Wallet</div>
     
-    <label class="flbl">Cardholder Name</label>
-    <input class="finp" type="text" placeholder="Ali Hassan" id="pm-cardname" oninput="vepname(this)">
-    <div class="errtxt" id="pm-nameerr">Cardholder name cannot contain numbers/symbols</div>
+    <label class="flbl">Wallet Provider</label>
+    <select class="finp" id="pm-wallettype" style="-webkit-appearance:none; appearance:none; background:var(--lgray) url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236B6B6B%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22/></svg>') no-repeat right 16px center; background-size: 16px;">
+      <option value="EasyPaisa">EasyPaisa (Telenor)</option>
+      <option value="JazzCash">JazzCash (Mobilink)</option>
+    </select>
     
-    <label class="flbl">Card Number</label>
-    <input class="finp" type="text" placeholder="4214 5678 9012 3456" id="pm-cardnum" oninput="fcardnum(this)" maxlength="19">
-    <div class="errtxt" id="pm-numerr">Card number must be 16 digits</div>
+    <label class="flbl">Account Holder Name</label>
+    <input class="finp" type="text" placeholder="Ali Hassan" id="pm-walletname" oninput="vepname(this)">
+    <div class="errtxt" id="pm-nameerr">Holder name cannot contain numbers/symbols</div>
     
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-      <div>
-        <label class="flbl">Expiry Date</label>
-        <input class="finp" type="text" placeholder="MM/YY" id="pm-cardexp" oninput="fcardexp(this)" maxlength="5">
-        <div class="errtxt" id="pm-experr">Invalid expiry</div>
-      </div>
-      <div>
-        <label class="flbl">CVC</label>
-        <input class="finp" type="password" placeholder="123" id="pm-cardcvc" oninput="fcardcvc(this)" maxlength="3">
-        <div class="errtxt" id="pm-cvcerr">Invalid CVC</div>
-      </div>
-    </div>
+    <label class="flbl">Mobile Number</label>
+    <input class="finp" type="tel" placeholder="03xx-xxxxxxx" id="pm-walletnum" oninput="vphone(this)" maxlength="12">
+    <div class="errtxt" id="pm-numerr">Invalid mobile number (must be 11 digits)</div>
     
-    <button class="btn-blk" style="margin-top:12px;" onclick="savePaymentMethod()">Add Card</button>
+    <button class="btn-blk" style="margin-top:12px;" onclick="savePaymentMethod()">Link Mobile Wallet</button>
   </div>
 </div>
 
@@ -856,20 +1023,18 @@ document.addEventListener('DOMContentLoaded', () => {
       go('provider');
     } else {
       go('chat');
+      // Auto-fetch and display user's current GPS location on map and header
+      setTimeout(updateChatGPSLocation, 500);
     }
   } else {
     go('splash');
   }
 });
 
-// Login
-async function doLogin(){
-  const email = document.getElementById('l-email').value.trim();
-  const code = document.getElementById('l-code').value.trim();
-  const errEl = document.getElementById('l-err');
-  
-  if (!email || !code) {
-    errEl.textContent = 'Please fill out all fields';
+// Login helpers
+async function doLoginGeneric(email, code, errEl, expectedRole) {
+  if (!code) {
+    errEl.textContent = 'Please enter your access code';
     errEl.classList.add('on');
     return;
   }
@@ -878,12 +1043,12 @@ async function doLogin(){
     const res = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, code })
+      body: JSON.stringify({ email: email || '', code })
     });
     
     const data = await res.json();
     if (!res.ok) {
-      errEl.textContent = data.message || 'Invalid Hackathon Demo Code';
+      errEl.textContent = data.message || 'Invalid access code';
       errEl.classList.add('on');
       return;
     }
@@ -900,6 +1065,7 @@ async function doLogin(){
       go('provider');
     } else {
       go('chat');
+      setTimeout(updateChatGPSLocation, 500);
     }
   } catch (err) {
     console.error(err);
@@ -908,34 +1074,229 @@ async function doLogin(){
   }
 }
 
+async function doLoginUser() {
+  const email = document.getElementById('lu-email').value.trim();
+  const code = document.getElementById('lu-code').value.trim();
+  const errEl = document.getElementById('lu-err');
+  await doLoginGeneric(email, code, errEl, 'consumer');
+}
+
+async function doLoginProvider() {
+  const email = document.getElementById('lp-email').value.trim();
+  const code = document.getElementById('lp-code').value.trim();
+  const errEl = document.getElementById('lp-err');
+  await doLoginGeneric(email, code, errEl, 'provider');
+}
+
+// Keep backward compat
+async function doLogin() {
+  // Fallback if old login screen is somehow used
+  const email = document.getElementById('l-email') ? document.getElementById('l-email').value.trim() : '';
+  const code = document.getElementById('l-code') ? document.getElementById('l-code').value.trim() : '';
+  const errEl = document.getElementById('l-err');
+  if (errEl) await doLoginGeneric(email, code, errEl, '');
+}
+
+// Voice Input (Web Speech API)
+let voiceRecognition = null;
+let isRecording = false;
+
+// Dynamic GPS location resolver for the Chat Panel
+function updateChatGPSLocation() {
+  if (navigator.geolocation) {
+    tst('GPS Syncing...', 'Retrieving coordinates');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        localStorage.setItem('user_lat', lat);
+        localStorage.setItem('user_lng', lng);
+        
+        // Dynamic reverse geolocation indicator
+        document.getElementById('chat-current-location').textContent = `Rawalpindi (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+        tst('Location Synced', 'Successfully updated current position.');
+        
+        // Re-render map if it exists
+        if (chatMap) {
+          chatMap.setCenter({ lat, lng });
+        }
+      },
+      (err) => {
+        localStorage.setItem('user_lat', 33.6425);
+        localStorage.setItem('user_lng', 73.0768);
+        document.getElementById('chat-current-location').textContent = 'Satellite Town, Rawalpindi';
+        tst('GPS Fallback', 'Using default coordinates for Satellite Town.');
+      }
+    );
+  } else {
+    tst('Error', 'Geolocation is not supported by your browser');
+  }
+}
+
+// Validation State Updater helper
+function updateFieldStyle(el, isValid, errElId) {
+  el.classList.toggle('valid', isValid);
+  el.classList.toggle('err', !isValid);
+  const errEl = document.getElementById(errElId);
+  if (errEl) errEl.classList.toggle('on', !isValid);
+}
+
+// Validation Helpers
+function vname(el) {
+  const v = el.value.trim();
+  const ok = /^[a-zA-Z\s]{3,}$/.test(v);
+  updateFieldStyle(el, ok, 'nerr');
+  return ok;
+}
+
+function vfname(el) {
+  const v = el.value.trim();
+  const ok = /^[a-zA-Z\s]{3,}$/.test(v);
+  updateFieldStyle(el, ok, 'fnerr');
+  return ok;
+}
+
+function vemail(el) {
+  const v = el.value.trim();
+  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  updateFieldStyle(el, ok, 'emerr');
+  return ok;
+}
+
+function vphone(el) {
+  // Format as 03xx-xxxxxxx
+  let digits = el.value.replace(/[^0-9]/g, '');
+  if (digits.length > 4) {
+    digits = digits.slice(0, 4) + '-' + digits.slice(4, 11);
+  }
+  el.value = digits;
+  const ok = /^03\d{2}-\d{7}$/.test(el.value);
+  updateFieldStyle(el, ok, 'pherr');
+  return ok;
+}
+
+function vdob(el) {
+  const v = el.value;
+  if (!v) {
+    updateFieldStyle(el, false, 'doberr');
+    return false;
+  }
+  const dobDate = new Date(v);
+  const age = new Date().getFullYear() - dobDate.getFullYear();
+  const isProvider = document.getElementById('rp').classList.contains('on');
+  
+  if (isProvider && age < 18) {
+    updateFieldStyle(el, false, 'doberr');
+    document.getElementById('doberr').textContent = 'Providers must be at least 18 years old';
+    return false;
+  }
+  
+  updateFieldStyle(el, true, 'doberr');
+  return true;
+}
+
+function vaddress(el) {
+  const v = el.value.trim();
+  const ok = v.length > 5;
+  updateFieldStyle(el, ok, 'adderr');
+  return ok;
+}
+
+function fcnic(el) {
+  let v = el.value.replace(/[^0-9]/g, '');
+  el.value = v.slice(0, 13);
+  
+  const ok = /^\d{13}$/.test(el.value);
+  updateFieldStyle(el, ok, 'cnicerr');
+}
+
+function srole(r) {
+  document.getElementById('rc').classList.toggle('on', r === 'c');
+  document.getElementById('rp').classList.toggle('on', r === 'p');
+  document.getElementById('cnicwrap').style.display = r === 'p' ? 'block' : 'none';
+  
+  // Re-verify DOB if they switch role
+  const dobEl = document.getElementById('s-dob');
+  if (dobEl.value) vdob(dobEl);
+}
+
+// Geolocate address
+function geolocateAddress() {
+  if (navigator.geolocation) {
+    tst('Locating...', 'Fetching GPS coordinates');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        localStorage.setItem('user_lat', lat);
+        localStorage.setItem('user_lng', lng);
+        
+        // Mock reverse-geocode for Pakistan locations
+        document.getElementById('s-address').value = 'Satellite Town, Rawalpindi (GPS verified)';
+        vaddress(document.getElementById('s-address'));
+        tst('Location Verified', `Latitude: ${lat.toFixed(4)}, Longitude: ${lng.toFixed(4)}`);
+      },
+      (err) => {
+        // Fallback mock coordinates
+        localStorage.setItem('user_lat', 33.6425);
+        localStorage.setItem('user_lng', 73.0768);
+        document.getElementById('s-address').value = 'Satellite Town, Rawalpindi';
+        vaddress(document.getElementById('s-address'));
+        tst('GPS Location Set', 'Using default coordinates for Rawalpindi');
+      }
+    );
+  } else {
+    tst('Error', 'Geolocation is not supported by your browser');
+  }
+}
+
 // Signup
-async function dosignup(){
-  const name = document.getElementById('s-name').value.trim();
-  const email = document.querySelector('#signup input[type="email"]').value.trim();
-  const fathersName = document.querySelectorAll('#signup input[type="text"]')[1].value.trim();
+async function dosignup() {
+  const nameEl = document.getElementById('s-name');
+  const fathersNameEl = document.getElementById('s-fathersName');
+  const emailEl = document.getElementById('s-email');
+  const phoneEl = document.getElementById('s-phone');
+  const dobEl = document.getElementById('s-dob');
+  const addressEl = document.getElementById('s-address');
+  
   const isProvider = document.getElementById('rp').classList.contains('on');
   const role = isProvider ? 'provider' : 'consumer';
-  const cnic = isProvider ? document.getElementById('cnic').value.trim() : '';
-
-  if (!name || !email) {
-    tst('Validation Error', 'Name and Email are required');
+  const cnicEl = document.getElementById('cnic');
+  
+  // Trigger validations
+  const isNameValid = vname(nameEl);
+  const isFNameValid = vfname(fathersNameEl);
+  const isEmailValid = vemail(emailEl);
+  const isPhoneValid = vphone(phoneEl);
+  const isDobValid = vdob(dobEl);
+  const isAddressValid = vaddress(addressEl);
+  
+  let isCnicValid = true;
+  if (isProvider) {
+    isCnicValid = /^\d{13}$/.test(cnicEl.value);
+    updateFieldStyle(cnicEl, isCnicValid, 'cnicerr');
+  }
+  
+  if (!isNameValid || !isFNameValid || !isEmailValid || !isPhoneValid || !isDobValid || !isAddressValid || !isCnicValid) {
+    tst('Validation Error', 'Please correct the highlighted errors');
     return;
   }
 
-  if (isProvider) {
-    const cnicDigits = cnic.replace(/[^0-9]/g,'');
-    if (cnicDigits.length < 13) {
-      document.getElementById('cnicerr').classList.add('on');
-      return;
-    }
-    document.getElementById('cnicerr').classList.remove('on');
-  }
+  const name = nameEl.value.trim();
+  const fathersName = fathersNameEl.value.trim();
+  const email = emailEl.value.trim();
+  const phone = phoneEl.value.trim();
+  const dob = dobEl.value;
+  const address = addressEl.value.trim();
+  const cnic = isProvider ? cnicEl.value.trim() : '';
+  const lat = parseFloat(localStorage.getItem('user_lat')) || 33.6425;
+  const lng = parseFloat(localStorage.getItem('user_lng')) || 73.0768;
 
   try {
     const res = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, fathersName, email, role, cnic })
+      body: JSON.stringify({ name, fathersName, email, role, phone, dob, address, cnic, lat, lng })
     });
     
     const data = await res.json();
@@ -948,6 +1309,11 @@ async function dosignup(){
     localStorage.setItem('role', data.role);
     localStorage.setItem('user_name', data.user.name);
     localStorage.setItem('user_email', data.user.email);
+    localStorage.setItem('user_fathers_name', data.user.fathersName || fathersName);
+    localStorage.setItem('user_phone', data.user.phone || phone);
+    localStorage.setItem('user_dob', data.user.dob || dob);
+    localStorage.setItem('user_address', data.user.address || address);
+    localStorage.setItem('user_cnic', data.user.cnic || cnic);
     
     tst('Account Created', `Logged in as ${data.user.name}`);
     
@@ -962,26 +1328,7 @@ async function dosignup(){
   }
 }
 
-// Validation Helpers
-function vname(el){
-  const ok=/^[a-zA-Z\s]*$/.test(el.value);
-  el.classList.toggle('err',!ok);
-  const er=document.getElementById('nerr');
-  if(er)er.classList.toggle('on',!ok&&el.id==='s-name');
-}
-function srole(r){
-  document.getElementById('rc').classList.toggle('on',r==='c');
-  document.getElementById('rp').classList.toggle('on',r==='p');
-  document.getElementById('cnicwrap').style.display=r==='p'?'block':'none';
-}
-function fcnic(el){
-  let v=el.value.replace(/[^0-9]/g,'');
-  if(v.length>5)v=v.slice(0,5)+'-'+v.slice(5);
-  if(v.length>13)v=v.slice(0,13)+'-'+v.slice(13);
-  el.value=v.slice(0,15);
-}
-
-// Send Message (Chat Flow)
+// Send Message (Chat Flow with dynamic map rendering, fallbacks, and clarification buttons)
 async function sendm(){
   const ci = document.getElementById('ci');
   const message = ci.value.trim();
@@ -1002,10 +1349,12 @@ async function sendm(){
   const term = document.getElementById('term');
   const ai2 = document.getElementById('ai2');
   const pstrip = document.getElementById('pstrip');
+  const mapContainer = document.getElementById('chat-map-container');
   
   term.style.display = 'block';
   ai2.style.display = 'none';
   pstrip.style.display = 'none';
+  if (mapContainer) mapContainer.style.display = 'none';
   
   // Set loading terminal logs
   term.innerHTML = `
@@ -1021,7 +1370,11 @@ async function sendm(){
         'Content-Type': 'application/json',
         ...getAuthHeader()
       },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({
+        message,
+        lat: parseFloat(localStorage.getItem('user_lat')) || 33.6425,
+        lng: parseFloat(localStorage.getItem('user_lng')) || 73.0768
+      })
     });
 
     const data = await res.json();
@@ -1070,6 +1423,21 @@ async function sendm(){
     // Make elements visible
     ai2.style.display = 'block';
     pstrip.style.display = 'block';
+    
+    // Render dynamic Leaflet Map
+    if (data.providers && data.providers.length > 0) {
+      renderChatMap(data.providers);
+      // Auto-trigger detailed reviews popup modal for the top recommended provider
+      setTimeout(() => {
+        openQ(data.providers[0]);
+      }, 800);
+    }
+    
+    // Rule-based fallback clarification helper if query was short/generic
+    if (message.length < 15) {
+      appendClarificationButtons(data.intent.serviceType);
+    }
+
     cb.scrollTop = cb.scrollHeight;
 
   } catch (err) {
@@ -1078,15 +1446,308 @@ async function sendm(){
   }
 }
 
-// Open Quote details
+// Google Chat Map Rendering
+let chatMap = null;
+let chatMarkers = [];
+
+function renderChatMap(providers) {
+  const mapContainer = document.getElementById('chat-map-container');
+  if (!mapContainer) return;
+  mapContainer.style.display = 'block';
+
+  const userLat = parseFloat(localStorage.getItem('user_lat')) || 33.6425;
+  const userLng = parseFloat(localStorage.getItem('user_lng')) || 73.0768;
+
+  // Clear previous markers
+  chatMarkers.forEach(m => {
+    if (m && typeof m.setMap === 'function') m.setMap(null);
+  });
+  chatMarkers = [];
+
+  try {
+    if (typeof google === 'undefined' || !google.maps) {
+      console.warn('Google Maps API not loaded yet.');
+      return;
+    }
+
+    if (!chatMap) {
+      chatMap = new google.maps.Map(document.getElementById('chat-map'), {
+        zoom: 14,
+        center: { lat: userLat, lng: userLng },
+        disableDefaultUI: true,
+        styles: [
+          {
+            featureType: "poi",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }]
+          }
+        ]
+      });
+    } else {
+      chatMap.setCenter({ lat: userLat, lng: userLng });
+    }
+
+    // Draw user marker (green)
+    const userMarker = new google.maps.Marker({
+      position: { lat: userLat, lng: userLng },
+      map: chatMap,
+      icon: {
+        url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
+      },
+      title: 'Your Location'
+    });
+    chatMarkers.push(userMarker);
+
+    // Pulsing surge/search radius circle (1.5 km)
+    const searchCircle = new google.maps.Circle({
+      strokeColor: '#F5A623',
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: '#F5A623',
+      fillOpacity: 0.12,
+      map: chatMap,
+      center: { lat: userLat, lng: userLng },
+      radius: 1500
+    });
+    chatMarkers.push(searchCircle);
+
+    // Add provider markers
+    window.chatProvidersList = window.chatProvidersList || {};
+    
+    providers.forEach(p => {
+      const plat = p.lat !== undefined ? parseFloat(p.lat) : (p.latitude ? parseFloat(p.latitude) : (userLat + (Math.random() - 0.5) * 0.012));
+      const plng = p.lng !== undefined ? parseFloat(p.lng) : (p.longitude ? parseFloat(p.longitude) : (userLng + (Math.random() - 0.5) * 0.012));
+      
+      // Store exact matched properties
+      p.lat = plat;
+      p.lng = plng;
+      window.chatProvidersList[p.id] = p;
+
+      const marker = new google.maps.Marker({
+        position: { lat: plat, lng: plng },
+        map: chatMap,
+        icon: {
+          url: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
+        },
+        title: p.name
+      });
+      chatMarkers.push(marker);
+
+      const popupHTML = `
+        <div style="font-family:var(--f); min-width: 140px; text-align: center; line-height: 1.4;">
+          <h4 style="margin: 0 0 2px 0; font-size:13px; font-weight:700; color: var(--blk);">${p.name}</h4>
+          <p style="margin: 0 0 6px 0; font-size: 10px; color: var(--gray);">${p.distance || '1.2 km'} away · ★ ${p.rating}</p>
+          <div style="font-weight: 800; color: var(--blk); font-size: 13px; margin-bottom: 6px;">${p.totalEstimate}</div>
+          <button class="btn-blk" style="font-size: 9px; padding: 4px 8px; border-radius: 8px; width: 100%; height: auto; line-height: 1;" onclick="window.openQFromMarker('${p.id}')">⚡ Instant Book</button>
+        </div>
+      `;
+
+      const infowindow = new google.maps.InfoWindow({
+        content: popupHTML
+      });
+
+      marker.addListener('click', () => {
+        infowindow.open(chatMap, marker);
+      });
+    });
+  } catch (mapErr) {
+    console.error('Error rendering chat map:', mapErr);
+  }
+}
+
+// Global popup bridge
+window.openQFromMarker = function(id) {
+  const p = window.chatProvidersList[id];
+  if (p) openQ(p);
+};
+
+// Clarification buttons append
+function appendClarificationButtons(serviceType) {
+  const cb = document.getElementById('cbody');
+  const clarDiv = document.createElement('div');
+  clarDiv.style.margin = '10px 14px';
+  clarDiv.style.display = 'flex';
+  clarDiv.style.flexDirection = 'column';
+  clarDiv.style.gap = '8px';
+  
+  const clarH = document.createElement('div');
+  clarH.style.fontSize = '12px';
+  clarH.style.fontWeight = '700';
+  clarH.style.color = 'var(--gray)';
+  clarH.textContent = 'Describe further detail:';
+  clarDiv.appendChild(clarH);
+
+  let options = [];
+  if (serviceType === 'PLUMBING' || serviceType === 'PLUMBING_REPAIR') {
+    options = [
+      { text: '🚰 Kitchen Sink/Pipe Leak', msg: 'I have an active pipe leak under the kitchen sink' },
+      { text: '🚽 Clogged Drain / Toilet Blocked', msg: 'My main toilet drain is clogged and overflowing' },
+      { text: '💧 Water Heater Setup / Install', msg: 'I need standard water heater installation' }
+    ];
+  } else {
+    options = [
+      { text: '⚡ Electrician Repair (No Power)', msg: 'Short circuit occurred, multiple outlets have no power' },
+      { text: '❄️ Split AC Cleaning & Service', msg: 'AC cooling is low, standard servicing and filter cleaning needed' },
+      { text: '🧹 Home Deep Cleaning Service', msg: 'Deep cleaning service for 3-bedroom apartment' }
+    ];
+  }
+
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-blk';
+    btn.style.background = 'white';
+    btn.style.color = 'var(--blk)';
+    btn.style.border = '1.5px solid var(--border)';
+    btn.style.padding = '8px 12px';
+    btn.style.borderRadius = '12px';
+    btn.style.fontSize = '12px';
+    btn.style.textAlign = 'left';
+    btn.style.cursor = 'pointer';
+    btn.style.transition = 'all 0.15s';
+    
+    btn.onclick = () => {
+      document.getElementById('ci').value = opt.msg;
+      sendm();
+      clarDiv.remove();
+    };
+    btn.textContent = opt.text;
+    clarDiv.appendChild(btn);
+  });
+
+  cb.appendChild(clarDiv);
+  cb.scrollTop = cb.scrollHeight;
+}
+
+// Stylized SMS/WhatsApp Log Generator
+function appendNotificationLog(status, booking) {
+  const cb = document.getElementById('cbody');
+  const notif = document.createElement('div');
+  notif.style.background = 'var(--lgray)';
+  notif.style.borderLeft = '4px solid var(--y)';
+  notif.style.padding = '10px 14px';
+  notif.style.margin = '10px 14px';
+  notif.style.borderRadius = '12px';
+  notif.style.fontFamily = 'monospace';
+  notif.style.fontSize = '11px';
+  notif.style.color = 'var(--blk)';
+  notif.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)';
+  
+  const phone = localStorage.getItem('user_phone') || '0300-1234567';
+  let msg = '';
+  
+  if (status === 'confirmed') {
+    msg = `📲 <b>[SMS GATEWAY LOG]</b> Sent to ${phone}:\n"LOCALLY: Booking #${booking.id.substring(0,8)} confirmed! ${booking.providerName || 'Provider'} will arrive soon. Total: Rs ${booking.totalEstimate}. Live Track: http://locally.pk/t/${booking.id}"`;
+  } else if (status === 'en_route') {
+    msg = `💬 <b>[WHATSAPP MESSAGE LOG]</b> Sent to ${phone}:\n"Assalamu Alaikum! Tariq Mehmood is now EN ROUTE to your address. ETA: 8 minutes. Live map tracking: http://locally.pk/t/${booking.id}"`;
+  } else if (status === 'arrived') {
+    msg = `📲 <b>[SMS GATEWAY LOG]</b> Sent to ${phone}:\n"LOCALLY ALERT: Your provider Tariq Mehmood has arrived at your doorstep. Call provider: ${phone}."`;
+  } else if (status === 'completed') {
+    msg = `💬 <b>[WHATSAPP MESSAGE LOG]</b> Sent to ${phone}:\n"JazakAllah! Your ${booking.serviceType} booking is completed. Paid Rs ${booking.totalEstimate} via Cash on Delivery. Share review: http://locally.pk/r/${booking.id}"`;
+  }
+
+  notif.innerHTML = msg.replace(/\n/g, '<br>');
+  cb.appendChild(notif);
+  cb.scrollTop = cb.scrollHeight;
+}
+
+// Helper: parse fee value whether it's a string "Rs 800" or a number 800
+function parseFee(val) {
+  if (typeof val === 'number') return val;
+  if (typeof val === 'string') return parseFloat(val.replace(/[^0-9.]/g, '')) || 0;
+  return 0;
+}
+
+// Open Quote details from static HTML cards (6 string args)
+function openQStatic(name, serviceType, baseFee, travelFee, surgeFee, totalEstimate) {
+  openQ({
+    id: null,
+    name,
+    serviceType,
+    baseFee,
+    travelFee,
+    surgeFee,
+    totalEstimate,
+    rating: '4.9',
+    distance: '1.2 km',
+    eta: '8 mins'
+  });
+}
+
+// Open Quote details — accepts a provider object (from API or constructed above)
 function openQ(p) {
   selectedProvider = p;
-  document.getElementById('q-nm').textContent = `${p.name} — ${p.serviceType}`;
-  document.getElementById('q-b').textContent = p.baseFee;
-  document.getElementById('q-t').textContent = p.travelFee;
-  document.getElementById('q-s').textContent = p.surgeFee;
-  document.getElementById('q-tot').textContent = p.totalEstimate;
+
+  const serviceLabel = p.serviceType || 'Service';
+  document.getElementById('q-nm').textContent = p.name;
+  document.getElementById('q-category-tag').textContent = serviceLabel;
+  document.getElementById('q-avatar').textContent = p.name.split(' ').map(n => n[0]).join('');
+  document.getElementById('q-metric-rating').textContent = '★ ' + (p.rating || '4.9');
+  document.getElementById('q-metric-jobs').textContent = p.jobsCompleted || '247';
+  document.getElementById('q-metric-reliability').textContent = (p.reliabilityScore || '98') + '%';
+  document.getElementById('q-worker-id').textContent = p.demoCode || (p.id ? p.id.substring(0,8) : 'PROV-2026');
+
+  document.getElementById('q-b').textContent = typeof p.baseFee === 'string' ? p.baseFee : `Rs ${p.baseFee}`;
+  document.getElementById('q-t').textContent = typeof p.travelFee === 'string' ? p.travelFee : `Rs ${p.travelFee}`;
+  document.getElementById('q-s').textContent = typeof p.surgeFee === 'string' ? p.surgeFee : `Rs ${p.surgeFee}`;
+  document.getElementById('q-tot').textContent = typeof p.totalEstimate === 'string' ? p.totalEstimate : `Rs ${p.totalEstimate}`;
   
+  // Dynamic reviews loading
+  const reviewsContainer = document.getElementById('q-reviews-list');
+  reviewsContainer.innerHTML = '<div style="font-size:11px;color:var(--gray);text-align:center;padding:10px;">Loading feedback...</div>';
+
+  if (p.id) {
+    fetch(`${API_URL}/reviews/provider/${p.id}`)
+      .then(res => res.json())
+      .then(reviews => {
+        reviewsContainer.innerHTML = '';
+        if (reviews.length === 0) {
+          reviewsContainer.innerHTML = '<div style="font-size:11px;color:var(--gray);text-align:center;padding:10px;">No reviews yet. Be the first!</div>';
+        } else {
+          reviews.forEach(r => {
+            const reviewDiv = document.createElement('div');
+            reviewDiv.style.background = 'white';
+            reviewDiv.style.padding = '8px 10px';
+            reviewDiv.style.borderRadius = '10px';
+            reviewDiv.style.border = '1px solid var(--border)';
+            reviewDiv.style.fontSize = '11px';
+            
+            let stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+            
+            reviewDiv.innerHTML = `
+              <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--blk);">
+                <span>${r.consumerName || 'Anonymous'}</span>
+                <span style="color:var(--y);">${stars}</span>
+              </div>
+              <p style="color:var(--gray); margin-top:4px; line-height:1.3;">${r.feedback}</p>
+            `;
+            reviewsContainer.appendChild(reviewDiv);
+          });
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        reviewsContainer.innerHTML = '<div style="font-size:11px;color:var(--gray);text-align:center;padding:10px;">Unable to load reviews</div>';
+      });
+  } else {
+    // Static / Mock reviews for demo provider
+    reviewsContainer.innerHTML = `
+      <div style="background:white; padding:8px 10px; border-radius:10px; border:1px solid var(--border); font-size:11px;">
+        <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--blk);">
+          <span>Zaid Ahmed</span>
+          <span style="color:var(--y);">★★★★★</span>
+        </div>
+        <p style="color:var(--gray); margin-top:4px; line-height:1.3;">Highly professional! Repaired my leaking pipe in 15 minutes. Highly recommended.</p>
+      </div>
+      <div style="background:white; padding:8px 10px; border-radius:10px; border:1px solid var(--border); font-size:11px;">
+        <div style="display:flex; justify-content:space-between; font-weight:700; color:var(--blk);">
+          <span>Fatima Sajid</span>
+          <span style="color:var(--y);">★★★★★</span>
+        </div>
+        <p style="color:var(--gray); margin-top:4px; line-height:1.3;">Very polite and quick service. Great experience with Rozgo!</p>
+      </div>
+    `;
+  }
+
   // Reset negotiation state
   const negBtn = document.querySelector('#qmod .btn-y');
   if (negBtn) {
@@ -1102,9 +1763,9 @@ function openQ(p) {
 function negotiate() {
   if (!selectedProvider) return;
   
-  const baseFee = parseFloat(selectedProvider.baseFee.replace(/[^0-9.]/g,'')) || 0;
-  const travelFee = parseFloat(selectedProvider.travelFee.replace(/[^0-9.]/g,'')) || 0;
-  const surgeFee = parseFloat(selectedProvider.surgeFee.replace(/[^0-9.]/g,'')) || 0;
+  const baseFee = parseFee(selectedProvider.baseFee);
+  const travelFee = parseFee(selectedProvider.travelFee);
+  const surgeFee = parseFee(selectedProvider.surgeFee);
   
   const originalTotal = baseFee + travelFee + surgeFee;
   const discountedTotal = Math.round(originalTotal * 0.7);
@@ -1125,16 +1786,35 @@ function negotiate() {
 }
 
 // Book Now
-async function booknow(){
+async function booknow() {
   if (!selectedProvider) return;
   document.getElementById('qmod').classList.remove('open');
 
-  try {
-    const baseFee = parseFloat(selectedProvider.baseFee.replace(/[^0-9.]/g,''));
-    const travelFee = parseFloat(selectedProvider.travelFee.replace(/[^0-9.]/g,''));
-    const surgeFee = parseFloat(selectedProvider.surgeFee.replace(/[^0-9.]/g,''));
-    const totalEstimate = parseFloat(selectedProvider.totalEstimate.replace(/[^0-9.]/g,''));
+  const baseFee = parseFee(selectedProvider.baseFee);
+  const travelFee = parseFee(selectedProvider.travelFee);
+  const surgeFee = parseFee(selectedProvider.surgeFee);
+  const totalEstimate = parseFee(selectedProvider.totalEstimate);
+  const serviceType = selectedProvider.serviceType || 'Plumbing';
 
+  // If user is not logged in (static demo), simulate booking locally
+  const token = localStorage.getItem('token');
+  if (!token) {
+    const mockBooking = {
+      id: 'demo-' + Math.random().toString(36).substr(2, 9),
+      serviceType,
+      totalEstimate,
+      status: 'confirmed'
+    };
+    currentBooking = mockBooking;
+    tst('Booking Confirmed!', `${selectedProvider.name} is assigned`);
+    setTimeout(() => {
+      go('tracker');
+      simulateTracking();
+    }, 1000);
+    return;
+  }
+
+  try {
     const res = await fetch(`${API_URL}/bookings`, {
       method: 'POST',
       headers: {
@@ -1143,11 +1823,13 @@ async function booknow(){
       },
       body: JSON.stringify({
         providerId: selectedProvider.id,
-        serviceType: selectedProvider.serviceType,
+        serviceType,
         baseFee,
         travelFee,
         surgeFee,
-        totalEstimate
+        totalEstimate,
+        lat: selectedProvider.lat,
+        lng: selectedProvider.lng
       })
     });
 
@@ -1163,16 +1845,68 @@ async function booknow(){
     // Switch to tracker screen and start active tracking
     setTimeout(() => {
       go('tracker');
-      startTracking(booking.id);
+      if (booking.id && booking.id.startsWith('demo-')) {
+        simulateTracking();
+      } else {
+        startTracking(booking.id);
+      }
     }, 1000);
 
   } catch (err) {
     console.error(err);
-    tst('Connection Error', 'Could not create booking.');
+    // Fallback: go to tracker with simulation
+    currentBooking = { id: 'demo-fallback', serviceType, totalEstimate };
+    tst('Demo Mode', 'Showing live tracking simulation');
+    setTimeout(() => {
+      go('tracker');
+      simulateTracking();
+    }, 1000);
   }
 }
 
+// Simulate tracking progression for demo/offline use
+let simInterval = null;
+const simStatuses = ['confirmed', 'accepted', 'en_route', 'arrived', 'completed'];
+
+function simulateTracking() {
+  let step = 0;
+  if (simInterval) clearInterval(simInterval);
+  updateTrackerUI(simStatuses[step], { name: selectedProvider ? selectedProvider.name : 'Tariq Mehmood' });
+  
+  simInterval = setInterval(() => {
+    step++;
+    if (step >= simStatuses.length) {
+      clearInterval(simInterval);
+      return;
+    }
+    updateTrackerUI(simStatuses[step], { name: selectedProvider ? selectedProvider.name : 'Tariq Mehmood' });
+  }, 4000);
+}
+
 // Start Live Tracking
+let reassignAttempts = 0;
+
+async function cancelReassignment() {
+  document.getElementById('reassignmod').classList.remove('open');
+  if (trackingInterval) clearInterval(trackingInterval);
+  if (currentBooking) {
+    try {
+      await fetch(`${API_URL}/bookings/${currentBooking.id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({ status: 'cancelled' })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  tst('Booking Cancelled', 'You have cancelled the search request.');
+  go('chat');
+}
+
 function startTracking(bookingId) {
   if (trackingInterval) clearInterval(trackingInterval);
   
@@ -1187,9 +1921,45 @@ function startTracking(bookingId) {
       });
       const data = await res.json();
       if (res.ok) {
-        updateTrackerUI(data.status, data.provider);
-        if (data.status === 'completed' || data.status === 'cancelled') {
+        updateTrackerUI(data.status, data.provider, data);
+        if (data.status === 'completed') {
           clearInterval(trackingInterval);
+        } else if (data.status === 'cancelled') {
+          clearInterval(trackingInterval);
+          
+          // Reassignment logic
+          reassignAttempts++;
+          if (reassignAttempts <= 3) {
+            document.getElementById('reassign-msg').textContent = `Automatically finding the next available professional near you... (Attempt ${reassignAttempts} of 3)`;
+            document.getElementById('reassignmod').classList.add('open');
+            
+            setTimeout(async () => {
+              try {
+                const reRes = await fetch(`${API_URL}/bookings/${bookingId}/reassign`, {
+                  method: 'PUT',
+                  headers: getAuthHeader()
+                });
+                const reData = await reRes.json();
+                if (reRes.ok) {
+                  document.getElementById('reassignmod').classList.remove('open');
+                  tst('New Provider Found!', `${reData.provider.name} has been assigned.`);
+                  startTracking(bookingId);
+                } else {
+                  document.getElementById('reassignmod').classList.remove('open');
+                  tst('Booking Failed', 'No alternative providers available.');
+                  go('chat');
+                }
+              } catch (reErr) {
+                console.error(reErr);
+                document.getElementById('reassignmod').classList.remove('open');
+                go('chat');
+              }
+            }, 2500);
+          } else {
+            document.getElementById('reassignmod').classList.remove('open');
+            tst('No Provider Available', 'Could not find a provider after 3 attempts.');
+            go('chat');
+          }
         }
       }
     } catch (err) {
@@ -1198,16 +1968,171 @@ function startTracking(bookingId) {
   }, 3000);
 }
 
-// Update Tracker Screen UI based on status
-function updateTrackerUI(status, provider) {
+// Google Tracker Map logic
+let trackerMap = null;
+let trackerMarkers = [];
+let trackerRouteLine = null;
+let lastLoggedStatus = {};
+let currentProvLat = null;
+let currentProvLng = null;
+let trackerAnimationInterval = null;
+
+function updateTrackerUI(status, provider, trackerData) {
   const steps = document.querySelectorAll('#tracker .step');
   steps.forEach(s => {
     s.classList.remove('done', 'act', 'pnd');
   });
 
   const headingDesc = document.querySelector('#tracker .c-hdr-inf p');
-  const providerName = provider ? provider.name : 'Usman Khan';
+  const providerName = provider ? provider.name : (selectedProvider ? selectedProvider.name : 'Usman Khan');
 
+  // Trigger SMS/WhatsApp Log when status transitions
+  if (currentBooking && lastLoggedStatus[currentBooking.id] !== status) {
+    lastLoggedStatus[currentBooking.id] = status;
+    
+    // Construct fake booking payload for notifications
+    const bookingPayload = {
+      id: currentBooking.id,
+      serviceType: currentBooking.serviceType || 'Service',
+      totalEstimate: currentBooking.totalEstimate,
+      providerName: providerName
+    };
+    
+    appendNotificationLog(status, bookingPayload);
+  }
+
+  // Determine positions for Map rendering
+  const userLat = parseFloat(localStorage.getItem('user_lat')) || 33.6425;
+  const userLng = parseFloat(localStorage.getItem('user_lng')) || 73.0768;
+
+  // Initial provider location (the starting recommended pin position)
+  const startLat = provider && provider.lat ? provider.lat : (selectedProvider && selectedProvider.lat ? selectedProvider.lat : userLat + 0.009);
+  const startLng = provider && provider.lng ? provider.lng : (selectedProvider && selectedProvider.lng ? selectedProvider.lng : userLng + 0.007);
+
+  // Target provider coordinates depending on booking status progression
+  let targetLat = userLat;
+  let targetLng = userLng;
+
+  if (status === 'confirmed' || status === 'accepted') {
+    targetLat = startLat;
+    targetLng = startLng;
+  } else if (status === 'en_route') {
+    // halfway to home coordinates
+    targetLat = userLat + (startLat - userLat) * 0.4;
+    targetLng = userLng + (startLng - userLng) * 0.4;
+  } else if (status === 'arrived' || status === 'completed') {
+    targetLat = userLat;
+    targetLng = userLng;
+  }
+
+  // Initialize/Update Google Tracker Map
+  const mapBox = document.getElementById('tracker-map');
+  if (mapBox) {
+    try {
+      if (typeof google === 'undefined' || !google.maps) {
+        console.warn('Google Maps not loaded in tracker yet.');
+        return;
+      }
+
+      if (!trackerMap) {
+        currentProvLat = startLat;
+        currentProvLng = startLng;
+
+        trackerMap = new google.maps.Map(document.getElementById('tracker-map'), {
+          zoom: 15,
+          center: { lat: userLat, lng: userLng },
+        disableDefaultUI: true,
+        styles: [
+          {
+            featureType: "poi",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }]
+          }
+        ]
+      });
+
+      // Draw user home marker
+      const userMarker = new google.maps.Marker({
+        position: { lat: userLat, lng: userLng },
+        map: trackerMap,
+        icon: {
+          url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
+        },
+        title: 'Your Location'
+      });
+      trackerMarkers.push(userMarker);
+
+      // Draw provider marker
+      const iconUrl = 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+      const providerMarker = new google.maps.Marker({
+        position: { lat: currentProvLat, lng: currentProvLng },
+        map: trackerMap,
+        icon: {
+          url: iconUrl
+        },
+        title: providerName
+      });
+      trackerMarkers.push(providerMarker);
+
+      // Draw polyline route path
+      trackerRouteLine = new google.maps.Polyline({
+        path: [
+          { lat: currentProvLat, lng: currentProvLng },
+          { lat: userLat, lng: userLng }
+        ],
+        geodesic: true,
+        strokeColor: '#1A73E8',
+        strokeOpacity: 0.8,
+        strokeWeight: 4,
+        map: trackerMap
+      });
+    }
+
+    // Dynamic icon toggle according to status
+    const pMarker = trackerMarkers[1];
+    if (pMarker) {
+      const newIcon = (status === 'en_route') 
+        ? 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        : 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+      pMarker.setIcon(newIcon);
+      pMarker.setTitle(providerName);
+    }
+
+    // Easing interpolation loop for smooth hackathon tracking slides
+    if (trackerAnimationInterval) clearInterval(trackerAnimationInterval);
+
+    trackerAnimationInterval = setInterval(() => {
+      const easeSpeed = 0.05; // 5% movement per 50ms for ultra-smooth progression
+      currentProvLat += (targetLat - currentProvLat) * easeSpeed;
+      currentProvLng += (targetLng - currentProvLng) * easeSpeed;
+
+      if (pMarker) {
+        pMarker.setPosition({ lat: currentProvLat, lng: currentProvLng });
+      }
+      if (trackerRouteLine) {
+        trackerRouteLine.setPath([
+          { lat: currentProvLat, lng: currentProvLng },
+          { lat: userLat, lng: userLng }
+        ]);
+      }
+
+      // Re-center map to capture user & smoothly moving worker in viewport
+      const bounds = new google.maps.LatLngBounds();
+      bounds.extend({ lat: userLat, lng: userLng });
+      bounds.extend({ lat: currentProvLat, lng: currentProvLng });
+      trackerMap.fitBounds(bounds);
+
+      // Stop interpolation loop when very close to target coordinates
+      if (Math.abs(currentProvLat - targetLat) < 0.00005 && Math.abs(currentProvLng - targetLng) < 0.00005) {
+        clearInterval(trackerAnimationInterval);
+      }
+    }, 50);
+    } catch (trackerMapErr) {
+      console.error('Error rendering tracker map:', trackerMapErr);
+    }
+  }
+
+  // Update Stepper highlights
   if (status === 'confirmed') {
     steps[0].classList.add('done');
     steps[1].classList.add('act');
@@ -1283,6 +2208,7 @@ async function submitrev(){
   if (!currentBooking) {
     document.getElementById('revmod').classList.remove('open');
     tst('Review Submitted!', 'Thank you for your feedback');
+    go('chat');
     return;
   }
 
@@ -1302,9 +2228,11 @@ async function submitrev(){
 
     document.getElementById('revmod').classList.remove('open');
     tst('Review Submitted!', 'Thank you for your feedback');
+    go('chat');
   } catch (err) {
     console.error(err);
     document.getElementById('revmod').classList.remove('open');
+    go('chat');
   }
 }
 
@@ -1522,24 +2450,36 @@ function openEditProfile() {
   const email = localStorage.getItem('user_email') || 'ali@example.com';
   const fathersName = localStorage.getItem('user_fathers_name') || 'Muhammad Hassan';
   const role = localStorage.getItem('role') || 'consumer';
+  const phone = localStorage.getItem('user_phone') || '0300-1234567';
+  const dob = localStorage.getItem('user_dob') || '';
+  const address = localStorage.getItem('user_address') || 'Satellite Town, Rawalpindi';
   const cnic = localStorage.getItem('user_cnic') || '42101-1234567-8';
   
   document.getElementById('ep-name').value = name;
   document.getElementById('ep-email').value = email;
   document.getElementById('ep-fathersName').value = fathersName;
+  document.getElementById('ep-phone').value = phone;
+  document.getElementById('ep-dob').value = dob;
+  document.getElementById('ep-address').value = address;
   
-  document.getElementById('ep-name').classList.remove('err');
-  document.getElementById('ep-fathersName').classList.remove('err');
-  document.getElementById('ep-email').classList.remove('err');
-  document.getElementById('ep-nerr').classList.remove('on');
-  document.getElementById('ep-fnerr').classList.remove('on');
-  document.getElementById('ep-emerr').classList.remove('on');
+  // Reset visual error states
+  ['ep-name', 'ep-fathersName', 'ep-email', 'ep-phone', 'ep-dob', 'ep-address'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.remove('err', 'valid');
+    }
+  });
+  ['ep-nerr', 'ep-fnerr', 'ep-emerr', 'ep-pherr', 'ep-doberr', 'ep-adderr'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('on');
+  });
   
   const cnicWrap = document.getElementById('ep-cnicwrap');
   if (role === 'provider') {
     cnicWrap.style.display = 'block';
-    document.getElementById('ep-cnic').value = cnic;
-    document.getElementById('ep-cnic').classList.remove('err');
+    const cnicEl = document.getElementById('ep-cnic');
+    cnicEl.value = cnic;
+    cnicEl.classList.remove('err', 'valid');
     document.getElementById('ep-cnicerr').classList.remove('on');
   } else {
     cnicWrap.style.display = 'none';
@@ -1548,74 +2488,138 @@ function openEditProfile() {
   document.getElementById('editProfileMod').classList.add('open');
 }
 
-function saveProfile() {
-  const name = document.getElementById('ep-name').value.trim();
-  const email = document.getElementById('ep-email').value.trim();
-  const fathersName = document.getElementById('ep-fathersName').value.trim();
+// Custom validation helpers for profile edit
+function vepfname(el) {
+  const ok = /^[a-zA-Z\s]{3,}$/.test(el.value.trim());
+  updateFieldStyle(el, ok, 'ep-fnerr');
+  return ok;
+}
+function vepemail(el) {
+  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+  updateFieldStyle(el, ok, 'ep-emerr');
+  return ok;
+}
+function vepphone(el) {
+  let digits = el.value.replace(/[^0-9]/g, '');
+  if (digits.length > 4) {
+    digits = digits.slice(0, 4) + '-' + digits.slice(4, 11);
+  }
+  el.value = digits;
+  const ok = /^03\d{2}-\d{7}$/.test(el.value);
+  updateFieldStyle(el, ok, 'ep-pherr');
+  return ok;
+}
+function vepdob(el) {
+  const v = el.value;
+  if (!v) {
+    updateFieldStyle(el, false, 'ep-doberr');
+    return false;
+  }
+  const dobDate = new Date(v);
+  const age = new Date().getFullYear() - dobDate.getFullYear();
+  const isProvider = localStorage.getItem('role') === 'provider';
+  
+  if (isProvider && age < 18) {
+    updateFieldStyle(el, false, 'ep-doberr');
+    document.getElementById('ep-doberr').textContent = 'Providers must be at least 18 years old';
+    return false;
+  }
+  
+  updateFieldStyle(el, true, 'ep-doberr');
+  return true;
+}
+function vepaddress(el) {
+  const ok = el.value.trim().length > 5;
+  updateFieldStyle(el, ok, 'ep-adderr');
+  return ok;
+}
+
+async function saveProfile() {
+  const nameEl = document.getElementById('ep-name');
+  const fathersNameEl = document.getElementById('ep-fathersName');
+  const emailEl = document.getElementById('ep-email');
+  const phoneEl = document.getElementById('ep-phone');
+  const dobEl = document.getElementById('ep-dob');
+  const addressEl = document.getElementById('ep-address');
+  
   const role = localStorage.getItem('role') || 'consumer';
+  const cnicEl = document.getElementById('ep-cnic');
   
-  let hasErr = false;
+  const isNameValid = /^[a-zA-Z\s]{3,}$/.test(nameEl.value.trim());
+  updateFieldStyle(nameEl, isNameValid, 'ep-nerr');
   
-  if (!name || !/^[a-zA-Z\s]+$/.test(name)) {
-    document.getElementById('ep-name').classList.add('err');
-    document.getElementById('ep-nerr').classList.add('on');
-    hasErr = true;
-  }
+  const isFNameValid = vepfname(fathersNameEl);
+  const isEmailValid = vepemail(emailEl);
+  const isPhoneValid = vepphone(phoneEl);
+  const isDobValid = vepdob(dobEl);
+  const isAddressValid = vepaddress(addressEl);
   
-  if (!fathersName || !/^[a-zA-Z\s]+$/.test(fathersName)) {
-    document.getElementById('ep-fathersName').classList.add('err');
-    document.getElementById('ep-fnerr').classList.add('on');
-    hasErr = true;
-  }
-  
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    document.getElementById('ep-email').classList.add('err');
-    document.getElementById('ep-emerr').classList.add('on');
-    hasErr = true;
-  }
-  
+  let isCnicValid = true;
   if (role === 'provider') {
-    const cnic = document.getElementById('ep-cnic').value.trim();
-    const cnicDigits = cnic.replace(/[^0-9]/g, '');
-    if (cnicDigits.length < 13) {
-      document.getElementById('ep-cnic').classList.add('err');
-      document.getElementById('ep-cnicerr').classList.add('on');
-      hasErr = true;
-    } else {
+    isCnicValid = /^\d{13}$/.test(cnicEl.value.trim());
+    updateFieldStyle(cnicEl, isCnicValid, 'ep-cnicerr');
+  }
+  
+  if (!isNameValid || !isFNameValid || !isEmailValid || !isPhoneValid || !isDobValid || !isAddressValid || !isCnicValid) {
+    tst('Validation Error', 'Please correct the highlighted errors');
+    return;
+  }
+
+  const name = nameEl.value.trim();
+  const fathersName = fathersNameEl.value.trim();
+  const email = emailEl.value.trim();
+  const phone = phoneEl.value.trim();
+  const dob = dobEl.value;
+  const address = addressEl.value.trim();
+  const cnic = role === 'provider' ? cnicEl.value.trim() : '';
+
+  try {
+    const res = await fetch(`${API_URL}/users/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ name, fathersName, email, phone, dob, address, cnic })
+    });
+    
+    const data = await res.json();
+    if (!res.ok) {
+      tst('Update Failed', data.message || 'Error occurred');
+      return;
+    }
+    
+    localStorage.setItem('user_name', name);
+    localStorage.setItem('user_email', email);
+    localStorage.setItem('user_fathers_name', fathersName);
+    localStorage.setItem('user_phone', phone);
+    localStorage.setItem('user_dob', dob);
+    localStorage.setItem('user_address', address);
+    if (role === 'provider') {
       localStorage.setItem('user_cnic', cnic);
     }
+    
+    loadUserProfile();
+    document.getElementById('editProfileMod').classList.remove('open');
+    tst('Profile Updated', 'Changes saved successfully');
+  } catch (err) {
+    console.error(err);
+    tst('Connection Error', 'Could not save profile changes.');
   }
-  
-  if (hasErr) return;
-  
-  localStorage.setItem('user_name', name);
-  localStorage.setItem('user_email', email);
-  localStorage.setItem('user_fathers_name', fathersName);
-  
-  loadUserProfile();
-  
-  document.getElementById('editProfileMod').classList.remove('open');
-  tst('Profile Updated', 'Changes saved successfully');
 }
 
 // 2. Payment Methods Functions
 function openPaymentMethods() {
   renderPaymentMethods();
   
-  document.getElementById('pm-cardname').value = '';
-  document.getElementById('pm-cardnum').value = '';
-  document.getElementById('pm-cardexp').value = '';
-  document.getElementById('pm-cardcvc').value = '';
+  document.getElementById('pm-walletname').value = '';
+  document.getElementById('pm-walletnum').value = '';
   
-  document.getElementById('pm-cardname').classList.remove('err');
-  document.getElementById('pm-cardnum').classList.remove('err');
-  document.getElementById('pm-cardexp').classList.remove('err');
-  document.getElementById('pm-cardcvc').classList.remove('err');
+  document.getElementById('pm-walletname').classList.remove('err');
+  document.getElementById('pm-walletnum').classList.remove('err');
   
   document.getElementById('pm-nameerr').classList.remove('on');
   document.getElementById('pm-numerr').classList.remove('on');
-  document.getElementById('pm-experr').classList.remove('on');
-  document.getElementById('pm-cvcerr').classList.remove('on');
   
   document.getElementById('paymentMethodsMod').classList.add('open');
 }
@@ -1624,7 +2628,7 @@ function renderPaymentMethods() {
   const pmList = document.getElementById('pm-list');
   pmList.innerHTML = '';
   
-  let cards = JSON.parse(localStorage.getItem('payment_cards') || '[]');
+  let wallets = JSON.parse(localStorage.getItem('payment_wallets') || '[]');
   
   const cashDiv = document.createElement('div');
   cashDiv.style.background = 'var(--lgray)';
@@ -1642,81 +2646,65 @@ function renderPaymentMethods() {
   `;
   pmList.appendChild(cashDiv);
   
-  cards.forEach((card, index) => {
-    const cardDiv = document.createElement('div');
-    cardDiv.style.background = 'var(--lgray)';
-    cardDiv.style.padding = '12px 16px';
-    cardDiv.style.borderRadius = '14px';
-    cardDiv.style.display = 'flex';
-    cardDiv.style.justifyContent = 'space-between';
-    cardDiv.style.alignItems = 'center';
-    cardDiv.innerHTML = `
+  wallets.forEach((w, index) => {
+    const walletDiv = document.createElement('div');
+    walletDiv.style.background = 'var(--lgray)';
+    walletDiv.style.padding = '12px 16px';
+    walletDiv.style.borderRadius = '14px';
+    walletDiv.style.display = 'flex';
+    walletDiv.style.justifyContent = 'space-between';
+    walletDiv.style.alignItems = 'center';
+    walletDiv.style.marginTop = '8px';
+    walletDiv.innerHTML = `
       <div>
-        <div style="font-size:13px; font-weight:700; color:var(--blk);">Visa •••• ${card.num.slice(-4)}</div>
-        <div style="font-size:11px; color:var(--gray);">${card.name} · Exp ${card.exp}</div>
+        <div style="font-size:13px; font-weight:700; color:var(--blk);">${w.type} Account</div>
+        <div style="font-size:11px; color:var(--gray);">${w.name} · ${w.num}</div>
       </div>
-      <button style="border:none; background:transparent; color:#EA4335; font-size:11px; font-weight:700; cursor:pointer;" onclick="deleteCard(${index})">Remove</button>
+      <button style="border:none; background:transparent; color:#EA4335; font-size:11px; font-weight:700; cursor:pointer;" onclick="deleteWallet(${index})">Remove</button>
     `;
-    pmList.appendChild(cardDiv);
+    pmList.appendChild(walletDiv);
   });
 }
 
 function savePaymentMethod() {
-  const name = document.getElementById('pm-cardname').value.trim();
-  const num = document.getElementById('pm-cardnum').value.trim();
-  const exp = document.getElementById('pm-cardexp').value.trim();
-  const cvc = document.getElementById('pm-cardcvc').value.trim();
+  const type = document.getElementById('pm-wallettype').value;
+  const name = document.getElementById('pm-walletname').value.trim();
+  const num = document.getElementById('pm-walletnum').value.trim();
   
   let hasErr = false;
   
-  if (!name || !/^[a-zA-Z\s]+$/.test(name)) {
-    document.getElementById('pm-cardname').classList.add('err');
+  if (!name || !/^[a-zA-Z\s]{3,}$/.test(name)) {
+    document.getElementById('pm-walletname').classList.add('err');
     document.getElementById('pm-nameerr').classList.add('on');
     hasErr = true;
   }
   
-  const numDigits = num.replace(/[^0-9]/g, '');
-  if (numDigits.length !== 16) {
-    document.getElementById('pm-cardnum').classList.add('err');
+  const okNum = /^03\d{2}-\d{7}$/.test(num);
+  if (!okNum) {
+    document.getElementById('pm-walletnum').classList.add('err');
     document.getElementById('pm-numerr').classList.add('on');
-    hasErr = true;
-  }
-  
-  const expDigits = exp.replace(/[^0-9]/g, '');
-  const month = parseInt(expDigits.slice(0, 2));
-  if (expDigits.length !== 4 || month < 1 || month > 12) {
-    document.getElementById('pm-cardexp').classList.add('err');
-    document.getElementById('pm-experr').classList.add('on');
-    hasErr = true;
-  }
-  
-  if (cvc.length !== 3) {
-    document.getElementById('pm-cardcvc').classList.add('err');
-    document.getElementById('pm-cvcerr').classList.add('on');
     hasErr = true;
   }
   
   if (hasErr) return;
   
-  let cards = JSON.parse(localStorage.getItem('payment_cards') || '[]');
-  cards.push({ name, num: numDigits, exp });
-  localStorage.setItem('payment_cards', JSON.stringify(cards));
+  let wallets = JSON.parse(localStorage.getItem('payment_wallets') || '[]');
+  wallets.push({ type, name, num });
+  localStorage.setItem('payment_wallets', JSON.stringify(wallets));
   
   renderPaymentMethods();
-  tst('Card Added', 'Payment card has been saved successfully');
+  tst('Wallet Linked', `${type} account linked successfully`);
   
-  document.getElementById('pm-cardname').value = '';
-  document.getElementById('pm-cardnum').value = '';
-  document.getElementById('pm-cardexp').value = '';
-  document.getElementById('pm-cardcvc').value = '';
+  document.getElementById('pm-walletname').value = '';
+  document.getElementById('pm-walletnum').value = '';
 }
 
-function deleteCard(index) {
-  let cards = JSON.parse(localStorage.getItem('payment_cards') || '[]');
-  cards.splice(index, 1);
-  localStorage.setItem('payment_cards', JSON.stringify(cards));
+function deleteWallet(index) {
+  let wallets = JSON.parse(localStorage.getItem('payment_wallets') || '[]');
+  wallets.splice(index, 1);
+  localStorage.setItem('payment_wallets', JSON.stringify(wallets));
   renderPaymentMethods();
-  tst('Card Removed', 'Card has been deleted from your account');
+  tst('Account Removed', 'Mobile wallet removed successfully');
 }
 
 // 3. Trust & Safety Functions

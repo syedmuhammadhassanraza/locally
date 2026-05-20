@@ -23,6 +23,34 @@ const User = sequelize.define('User', {
   demoCode: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  cnic: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  address: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  dob: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  lat: {
+    type: DataTypes.FLOAT,
+    allowNull: true
+  },
+  lng: {
+    type: DataTypes.FLOAT,
+    allowNull: true
+  },
+  manualLocation: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
 });
 
