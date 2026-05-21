@@ -38,8 +38,9 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// Serve frontend static files from parent directory
+// Serve frontend static files from parent directory (local) and current directory (Railway)
 app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(__dirname));
 
 // Serve uploaded profile pictures
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
