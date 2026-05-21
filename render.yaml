@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: locally-backend
+    runtime: node
+    repo: https://github.com/syedmuhammadhassanraza/locally.git
+    branch: main
+    rootDir: locally-backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
