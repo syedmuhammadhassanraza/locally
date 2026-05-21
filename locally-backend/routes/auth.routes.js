@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { registerUser, loginUser, refreshToken, logoutUser, verifyOtp } = require('../controllers/auth.controller');
 
-const { authLimiter } = require('../middleware/rateLimit.middleware');
+const { authLimiter } = require('../middleware/ratelimit.middleware');
 const { registerValidationRules, loginValidationRules, validate } = require('../middleware/validation.middleware');
 
 router.post('/register', authLimiter, registerValidationRules, validate, registerUser);
