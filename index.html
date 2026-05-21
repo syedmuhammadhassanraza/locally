@@ -1016,8 +1016,8 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
     <div class="errtxt" id="set-codeerr">Access code must be at least 4 characters</div>
     
     <label class="flbl" style="margin-top: 12px; display: block;">Backend API Server URL</label>
-    <input class="finp" type="text" placeholder="http://localhost:5000" id="set-backend-url">
-    <div style="font-size: 10px; color: var(--gray); margin-top: 4px;">Leave blank to auto-detect based on host origin.</div>
+    <input class="finp" type="text" placeholder="https://eloquent-forgiveness-production-5e37.up.railway.app" id="set-backend-url">
+    <div style="font-size: 10px; color: var(--gray); margin-top: 4px;">Leave blank to auto-detect or fall back to Railway backend.</div>
     
     <button class="btn-blk" style="margin-top:16px;" onclick="saveSettings()">Save Settings</button>
   </div>
@@ -1038,7 +1038,7 @@ const savedBackendUrl = localStorage.getItem('backend_api_url');
 const HOST_URL = savedBackendUrl 
   ? savedBackendUrl.replace(/\/api\/?$/, '') 
   : (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') || window.location.origin.startsWith('file://') || window.location.origin.startsWith('http://localhost')
-    ? 'http://localhost:5000'
+    ? 'https://eloquent-forgiveness-production-5e37.up.railway.app'
     : window.location.origin);
 const API_URL = `${HOST_URL}/api`;
 

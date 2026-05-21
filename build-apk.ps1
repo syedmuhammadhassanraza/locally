@@ -26,7 +26,7 @@ Set-Location -Path 'android'
 Write-Output 'Step 5: Verifying built APK...'
 $apkSource = 'app\build\outputs\apk\debug\app-debug.apk'
 $apkDestWorkspace = '..\app-debug.apk'
-$apkDestArtifacts = 'C:\Users\Computer\.gemini\antigravity\brain\52c3c5d3-6974-4966-aac6-20d16db82698\app-debug.apk'
+$apkDestArtifacts = 'C:\Users\Computer\.gemini\antigravity\brain\7d6e27ba-d6e5-4761-a79b-459e2f58a30d\app-debug.apk'
 
 if (Test-Path $apkSource) {
     Copy-Item $apkSource -Destination $apkDestWorkspace -Force

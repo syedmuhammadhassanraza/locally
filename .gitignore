@@ -6,4 +6,3 @@ locally-backend/node_modules/
 locally-backend/.env
 local-sdk/
 www/
-*.apk
