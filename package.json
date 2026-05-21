@@ -1,0 +1,17 @@
+{
+  "name": "rozgo-app",
+  "version": "1.0.0",
+  "description": "Rozgo Intelligent Service matching Platform",
+  "main": "index.js",
+  "scripts": {
+    "cap:init": "npx cap init Rozgo com.locally.rozgo --web-dir=.",
+    "cap:add": "npx cap add android",
+    "cap:sync": "npx cap sync",
+    "build:apk": "powershell -ExecutionPolicy Bypass -File ./build-apk.ps1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}

@@ -86,4 +86,31 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile };
+const uploadProfilePicture = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'Please select a profile picture to upload.' });
+    }
+
+    const { id, role } = req.user;
+    const picturePath = `/uploads/profiles/${req.file.filename}`;
+
+    if (role === 'provider') {
+      await Provider.update({ profilePicture: picturePath }, { where: { id } });
+    } else {
+      await User.update({ profilePicture: picturePath }, { where: { id } });
+    }
+
+    console.log(`[ROZGO] Profile picture uploaded for ${role} #${id}: ${picturePath}`);
+
+    return res.json({
+      message: 'Profile picture uploaded successfully.',
+      profilePicture: picturePath
+    });
+  } catch (error) {
+    console.error('uploadProfilePicture error:', error);
+    return res.status(500).json({ message: 'Server error uploading profile picture' });
+  }
+};
+
+module.exports = { getProfile, updateProfile, uploadProfilePicture };

@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="color-scheme" content="light only">
   <title>Rozgo</title>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBIvMMs4uZwx20ai_LmSfQ6zLm7FjSfJg"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBIvMMs4uZwx20ai_LmSfQ6zLm7FjSfJg&libraries=places,geometry"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -496,6 +499,19 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
       <div class="errtxt" id="cnicerr">Please enter a valid 13-digit Pakistani CNIC number.</div>
     </div>
     
+    <label class="flbl" style="margin-top:6px;">Profile Picture <span style="color:#EA4335;">*</span></label>
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+      <div id="s-pic-preview" style="width:64px; height:64px; border-radius:50%; background:var(--lgray); border:2px dashed var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gray)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div style="flex:1;">
+        <input type="file" id="s-profilePic" accept="image/jpeg,image/png,image/webp" onchange="previewProfilePic(this)" style="display:none;">
+        <button type="button" class="btn-blk-out" style="padding:10px 16px; font-size:12px; border-radius:12px; width:100%;" onclick="document.getElementById('s-profilePic').click()">📷 Upload Photo</button>
+        <div style="font-size:10px; color:var(--gray); margin-top:4px;">JPEG, PNG or WebP (max 5MB)</div>
+      </div>
+    </div>
+    <div class="errtxt" id="picerr">A profile picture is required for identity verification</div>
+    
     <button class="btn-blk" onclick="dosignup()" style="margin-top:10px;">Create Account →</button>
     <div class="lnkrow" style="margin-top:14px;">Already have an account? <span onclick="go('login')">Login</span></div>
   </div>
@@ -633,7 +649,38 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
       </div>
     </div>
     <button class="compbtn" onclick="completeJob()">Mark as Completed</button>
+    <button class="btn-blk-out" style="margin-top:8px; width:100%; border-color:#EA4335; color:#EA4335; font-size:14px; padding:14px; border-radius:32px; font-family:var(--f); font-weight:700; cursor:pointer;" onclick="openCancelBookingModal()">Cancel Booking</button>
   </div>
+  
+  <!-- CANCEL BOOKING MODAL -->
+  <div class="rovl" id="cancelBookingMod" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="rsht" style="padding: 24px 20px;">
+      <div class="sht-pill"></div>
+      <div style="font-size:32px; margin-bottom:8px; text-align:center;">⚠️</div>
+      <h3 style="font-size:16px; font-weight:800; color:var(--blk); margin-bottom:8px; text-align:center;">Cancel Booking?</h3>
+      
+      <div id="cancel-penalty-warning" style="background:#FFF5F5; border:1px solid #FFD2D2; border-radius:12px; padding:12px; margin-bottom:16px; font-size:11px; color:#EA4335; line-height:1.4; display:none;">
+        <strong>⚠️ Penalty Notice:</strong> You booked this provider more than 5 minutes ago. Cancelling now without a valid reason will incur a <strong>Rs. 200 cancellation penalty</strong> charged to your account.
+      </div>
+      <div id="cancel-no-penalty-info" style="background:#F0FFF4; border:1px solid #C2F0C2; border-radius:12px; padding:12px; margin-bottom:16px; font-size:11px; color:#34A853; line-height:1.4;">
+        <strong>✓ Free Cancellation:</strong> You can cancel this booking for free since it has been less than 5 minutes since booking.
+      </div>
+
+      <label class="flbl">Reason for cancellation</label>
+      <select class="finp" id="cancel-reason" style="-webkit-appearance:none; appearance:none; background:var(--lgray) url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2224%22 height=%2224%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236B6B6B%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22/></svg>') no-repeat right 16px center; background-size: 16px;">
+        <option value="none">No specific reason (changed my mind)</option>
+        <option value="provider_not_responding">Provider is not responding</option>
+        <option value="too_long_eta">ETA is too long / delayed</option>
+        <option value="incorrect_location">Selected wrong location</option>
+      </select>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px;">
+        <button class="btn-bk2" style="background:#ECEFF1; color:#455A64; border:1px solid #CFD8DC; margin:0; cursor:pointer;" onclick="document.getElementById('cancelBookingMod').classList.remove('open')">Go Back</button>
+        <button class="btn-bk2" style="background:#EA4335; color:white; border:none; margin:0; cursor:pointer;" onclick="confirmCancelBooking()">Confirm Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <div class="rovl" id="revmod" onclick="if(event.target===this)this.classList.remove('open')">
     <div class="rsht">
       <div class="sht-pill"></div>
@@ -962,13 +1009,17 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
       </div>
     </div>
     
-    <div class="divrow">Security</div>
+    <div class="divrow">Security & API Connection</div>
     
     <label class="flbl">Demo Access Code</label>
     <input class="finp" type="text" placeholder="USER-2026" id="set-code">
     <div class="errtxt" id="set-codeerr">Access code must be at least 4 characters</div>
     
-    <button class="btn-blk" style="margin-top:12px;" onclick="saveSettings()">Save Settings</button>
+    <label class="flbl" style="margin-top: 12px; display: block;">Backend API Server URL</label>
+    <input class="finp" type="text" placeholder="http://localhost:5000" id="set-backend-url">
+    <div style="font-size: 10px; color: var(--gray); margin-top: 4px;">Leave blank to auto-detect based on host origin.</div>
+    
+    <button class="btn-blk" style="margin-top:16px;" onclick="saveSettings()">Save Settings</button>
   </div>
 </div>
 
@@ -983,7 +1034,119 @@ body{font-family:var(--f);background:#F0F0F0;display:flex;flex-direction:column;
 
 
 <script>
-const API_URL = 'http://localhost:5000/api';
+const savedBackendUrl = localStorage.getItem('backend_api_url');
+const HOST_URL = savedBackendUrl 
+  ? savedBackendUrl.replace(/\/api\/?$/, '') 
+  : (window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1') || window.location.origin.startsWith('file://') || window.location.origin.startsWith('http://localhost')
+    ? 'http://localhost:5000'
+    : window.location.origin);
+const API_URL = `${HOST_URL}/api`;
+
+// ── Unhandled Frontend Exception Telemetry ──────────────────────────────
+window.addEventListener('error', (event) => {
+  const errorPayload = {
+    error: event.message || 'Unknown error',
+    info: `File: ${event.filename} - Line: ${event.lineno}:${event.colno}`,
+    userAgent: navigator.userAgent
+  };
+  fetch(`${API_URL}/logs/frontend`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(errorPayload)
+  }).catch(() => {});
+});
+
+// ── Socket.IO Real-Time Connection ──────────────────────────────────────
+let socket = null;
+function initSocket() {
+  if (socket && socket.connected) return;
+  socket = io(HOST_URL, { transports: ['websocket', 'polling'] });
+  
+  socket.on('connect', () => {
+    console.log('[Rozgo Socket] Connected:', socket.id);
+    // Register user/provider identity
+    const role = localStorage.getItem('role');
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        socket.emit('register_user', { userId: payload.id, role: role || 'consumer' });
+      } catch(e) {}
+    }
+  });
+  
+  socket.on('disconnect', () => console.log('[Rozgo Socket] Disconnected'));
+  
+  // Real-time location updates from provider
+  socket.on('location_updated', (data) => {
+    if (typeof updateProviderMarkerLive === 'function') {
+      updateProviderMarkerLive(data.lat, data.lng);
+    }
+  });
+  
+  // Booking status transitions
+  socket.on('booking:status_changed', (data) => {
+    console.log('[Socket] Booking status changed:', data.status);
+    if (typeof updateTrackerUI === 'function') {
+      updateTrackerUI(data.status);
+    }
+  });
+}
+
+// ── Profile Picture Preview ─────────────────────────────────────────────
+function previewProfilePic(input) {
+  const preview = document.getElementById('s-pic-preview');
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    if (file.size > 5 * 1024 * 1024) {
+      tst('File Too Large', 'Profile picture must be under 5MB');
+      input.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+      preview.style.border = '2px solid var(--y)';
+      document.getElementById('picerr').classList.remove('on');
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// ── Google Reverse Geocoding (Real Address from Coordinates) ────────────
+async function reverseGeocodeGoogle(lat, lng) {
+  try {
+    const geocoder = new google.maps.Geocoder();
+    const response = await geocoder.geocode({ location: { lat, lng } });
+    if (response.results && response.results.length > 0) {
+      return response.results[0].formatted_address;
+    }
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  } catch (err) {
+    console.warn('Reverse geocode failed:', err);
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  }
+}
+
+// ── Live Provider Marker Update (called by Socket.IO) ───────────────────
+function updateProviderMarkerLive(lat, lng) {
+  targetLat = parseFloat(lat);
+  targetLng = parseFloat(lng);
+  
+  if (trackerMarkers && trackerMarkers[1] && typeof trackerMarkers[1].setLatLng === 'function') {
+    trackerMarkers[1].setLatLng([targetLat, targetLng]);
+  }
+  if (trackerRouteLine && typeof trackerRouteLine.setLatLngs === 'function') {
+    const userLat = parseFloat(localStorage.getItem('user_lat')) || 33.6425;
+    const userLng = parseFloat(localStorage.getItem('user_lng')) || 73.0768;
+    trackerRouteLine.setLatLngs([
+      [targetLat, targetLng],
+      [userLat, userLng]
+    ]);
+  }
+  currentProvLat = targetLat;
+  currentProvLng = targetLng;
+}
 
 // Helper to get auth header
 function getAuthHeader() {
@@ -1002,6 +1165,15 @@ function go(id){
   } else if (id === 'profile') {
     loadUserProfile();
   }
+  
+  // Fix Leaflet map sizing issues when a hidden container becomes visible
+  setTimeout(() => {
+    if (id === 'chat' && typeof chatMap !== 'undefined' && chatMap) {
+      chatMap.invalidateSize();
+    } else if (id === 'tracker' && typeof trackerMap !== 'undefined' && trackerMap) {
+      trackerMap.invalidateSize();
+    }
+  }, 300);
 }
 
 function logout() {
@@ -1014,8 +1186,45 @@ let currentBooking = null;
 let trackingInterval = null;
 let selectedProvider = null;
 
+// Geolocation Request on Start
+function requestLocationAccessOnStart() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        localStorage.setItem('user_lat', lat);
+        localStorage.setItem('user_lng', lng);
+        tst('Location Access Granted ✓', 'Live location loaded successfully!');
+        
+        // Update header location address dynamically
+        const address = await reverseGeocodeGoogle(lat, lng);
+        const chatLocationEl = document.getElementById('chat-current-location');
+        if (chatLocationEl) chatLocationEl.textContent = address;
+        
+        // Re-render chatMap center if chatMap exists
+        if (typeof chatMap !== 'undefined' && chatMap) {
+          chatMap.setCenter({ lat, lng });
+        }
+      },
+      (err) => {
+        console.warn('Start location permission denied or failed:', err.message);
+        // Fallback to defaults if not already present
+        if (!localStorage.getItem('user_lat')) {
+          localStorage.setItem('user_lat', 33.6425);
+          localStorage.setItem('user_lng', 73.0768);
+        }
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  }
+}
+
 // Auth Check & Initialization
 document.addEventListener('DOMContentLoaded', () => {
+  // Prompt for live location permission on start immediately
+  requestLocationAccessOnStart();
+
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
   if (token) {
@@ -1058,8 +1267,12 @@ async function doLoginGeneric(email, code, errEl, expectedRole) {
     localStorage.setItem('role', data.role);
     localStorage.setItem('user_name', data.user.name);
     localStorage.setItem('user_email', data.user.email);
+    if (data.user.profilePicture) localStorage.setItem('user_profile_pic', data.user.profilePicture);
     
     tst('Login Successful', `Welcome ${data.user.name}`);
+    
+    // Initialize Socket.IO after login
+    initSocket();
     
     if (data.role === 'provider') {
       go('provider');
@@ -1104,29 +1317,35 @@ let isRecording = false;
 // Dynamic GPS location resolver for the Chat Panel
 function updateChatGPSLocation() {
   if (navigator.geolocation) {
-    tst('GPS Syncing...', 'Retrieving coordinates');
+    tst('GPS Syncing...', 'Retrieving your live coordinates');
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         localStorage.setItem('user_lat', lat);
         localStorage.setItem('user_lng', lng);
         
-        // Dynamic reverse geolocation indicator
-        document.getElementById('chat-current-location').textContent = `Rawalpindi (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
-        tst('Location Synced', 'Successfully updated current position.');
+        // Real Google reverse geocoding for actual address
+        const address = await reverseGeocodeGoogle(lat, lng);
+        document.getElementById('chat-current-location').textContent = address;
+        tst('Location Synced ✓', address);
         
         // Re-render map if it exists
         if (chatMap) {
           chatMap.setCenter({ lat, lng });
         }
+
+        // Initialize socket connection on first GPS sync
+        initSocket();
       },
       (err) => {
         localStorage.setItem('user_lat', 33.6425);
         localStorage.setItem('user_lng', 73.0768);
         document.getElementById('chat-current-location').textContent = 'Satellite Town, Rawalpindi';
         tst('GPS Fallback', 'Using default coordinates for Satellite Town.');
-      }
+        initSocket();
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   } else {
     tst('Error', 'Geolocation is not supported by your browser');
@@ -1223,27 +1442,29 @@ function srole(r) {
 // Geolocate address
 function geolocateAddress() {
   if (navigator.geolocation) {
-    tst('Locating...', 'Fetching GPS coordinates');
+    tst('Locating...', 'Fetching your real GPS coordinates');
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         localStorage.setItem('user_lat', lat);
         localStorage.setItem('user_lng', lng);
         
-        // Mock reverse-geocode for Pakistan locations
-        document.getElementById('s-address').value = 'Satellite Town, Rawalpindi (GPS verified)';
+        // Real Google reverse geocoding
+        const address = await reverseGeocodeGoogle(lat, lng);
+        document.getElementById('s-address').value = address;
         vaddress(document.getElementById('s-address'));
-        tst('Location Verified', `Latitude: ${lat.toFixed(4)}, Longitude: ${lng.toFixed(4)}`);
+        tst('Location Verified ✓', address);
       },
       (err) => {
-        // Fallback mock coordinates
+        // Fallback coordinates
         localStorage.setItem('user_lat', 33.6425);
         localStorage.setItem('user_lng', 73.0768);
         document.getElementById('s-address').value = 'Satellite Town, Rawalpindi';
         vaddress(document.getElementById('s-address'));
-        tst('GPS Location Set', 'Using default coordinates for Rawalpindi');
-      }
+        tst('GPS Fallback', 'Using default coordinates for Rawalpindi');
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
     );
   } else {
     tst('Error', 'Geolocation is not supported by your browser');
@@ -1258,6 +1479,7 @@ async function dosignup() {
   const phoneEl = document.getElementById('s-phone');
   const dobEl = document.getElementById('s-dob');
   const addressEl = document.getElementById('s-address');
+  const profilePicEl = document.getElementById('s-profilePic');
   
   const isProvider = document.getElementById('rp').classList.contains('on');
   const role = isProvider ? 'provider' : 'consumer';
@@ -1277,7 +1499,15 @@ async function dosignup() {
     updateFieldStyle(cnicEl, isCnicValid, 'cnicerr');
   }
   
-  if (!isNameValid || !isFNameValid || !isEmailValid || !isPhoneValid || !isDobValid || !isAddressValid || !isCnicValid) {
+  // Validate profile picture
+  const hasPic = profilePicEl.files && profilePicEl.files.length > 0;
+  if (!hasPic) {
+    document.getElementById('picerr').classList.add('on');
+  } else {
+    document.getElementById('picerr').classList.remove('on');
+  }
+  
+  if (!isNameValid || !isFNameValid || !isEmailValid || !isPhoneValid || !isDobValid || !isAddressValid || !isCnicValid || !hasPic) {
     tst('Validation Error', 'Please correct the highlighted errors');
     return;
   }
@@ -1315,7 +1545,30 @@ async function dosignup() {
     localStorage.setItem('user_address', data.user.address || address);
     localStorage.setItem('user_cnic', data.user.cnic || cnic);
     
+    // Upload profile picture after registration
+    if (profilePicEl.files[0]) {
+      const formData = new FormData();
+      formData.append('profilePicture', profilePicEl.files[0]);
+      try {
+        const picRes = await fetch(`${API_URL}/users/profile-picture`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${data.token}` },
+          body: formData
+        });
+        const picData = await picRes.json();
+        if (picRes.ok) {
+          localStorage.setItem('user_profile_pic', picData.profilePicture);
+          tst('Photo Verified ✓', 'Profile picture uploaded for validation');
+        }
+      } catch (picErr) {
+        console.warn('Profile pic upload failed:', picErr);
+      }
+    }
+    
     tst('Account Created', `Logged in as ${data.user.name}`);
+    
+    // Initialize Socket.IO after successful signup
+    initSocket();
     
     if (data.role === 'provider') {
       go('provider');
@@ -1383,13 +1636,8 @@ async function sendm(){
       return;
     }
 
-    // Update terminal output with AI results
-    term.innerHTML = `
-      <div class="tl">Parsing request...</div>
-      <div class="tl hl">Intent: ${data.intent.serviceType} [URGENT]</div>
-      <div class="tl">Urgency rating: ${data.intent.urgencyScore}/10</div>
-      <div class="tl hl">Matched ${data.providers.length} top providers ✓</div>
-    `;
+    // Hide terminal output when response arrives
+    term.style.display = 'none';
 
     // Append AI reply
     const aiMsg = document.createElement('div');
@@ -1460,55 +1708,49 @@ function renderChatMap(providers) {
 
   // Clear previous markers
   chatMarkers.forEach(m => {
-    if (m && typeof m.setMap === 'function') m.setMap(null);
+    if (m && typeof m.remove === 'function') m.remove();
   });
   chatMarkers = [];
 
   try {
-    if (typeof google === 'undefined' || !google.maps) {
-      console.warn('Google Maps API not loaded yet.');
+    if (typeof L === 'undefined') {
+      console.warn('Leaflet API not loaded yet.');
       return;
     }
 
     if (!chatMap) {
-      chatMap = new google.maps.Map(document.getElementById('chat-map'), {
-        zoom: 14,
-        center: { lat: userLat, lng: userLng },
-        disableDefaultUI: true,
-        styles: [
-          {
-            featureType: "poi",
-            elementType: "labels",
-            stylers: [{ visibility: "off" }]
-          }
-        ]
-      });
+      chatMap = L.map('chat-map', {
+        zoomControl: false,
+        attributionControl: false
+      }).setView([userLat, userLng], 14);
+
+      // Render ultra-premium map styles using CartoDB Positron (resembles Google Maps perfectly)
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20
+      }).addTo(chatMap);
     } else {
-      chatMap.setCenter({ lat: userLat, lng: userLng });
+      chatMap.setView([userLat, userLng], 14);
     }
 
-    // Draw user marker (green)
-    const userMarker = new google.maps.Marker({
-      position: { lat: userLat, lng: userLng },
-      map: chatMap,
-      icon: {
-        url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
-      },
-      title: 'Your Location'
+    // Custom marker icons using Leaflet DivIcon for stunning premium look
+    const userIcon = L.divIcon({
+      html: `<div style="background:#34A853; width:14px; height:14px; border:2.5px solid white; border-radius:50%; box-shadow:0 0 6px rgba(0,0,0,0.3);"></div>`,
+      className: 'custom-pin-user',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7]
     });
+
+    const userMarker = L.marker([userLat, userLng], { icon: userIcon, title: 'Your Location' }).addTo(chatMap);
     chatMarkers.push(userMarker);
 
-    // Pulsing surge/search radius circle (1.5 km)
-    const searchCircle = new google.maps.Circle({
-      strokeColor: '#F5A623',
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
+    // Radius circle (1.5 km)
+    const searchCircle = L.circle([userLat, userLng], {
+      color: '#F5A623',
       fillColor: '#F5A623',
       fillOpacity: 0.12,
-      map: chatMap,
-      center: { lat: userLat, lng: userLng },
+      weight: 2,
       radius: 1500
-    });
+    }).addTo(chatMap);
     chatMarkers.push(searchCircle);
 
     // Add provider markers
@@ -1518,37 +1760,30 @@ function renderChatMap(providers) {
       const plat = p.lat !== undefined ? parseFloat(p.lat) : (p.latitude ? parseFloat(p.latitude) : (userLat + (Math.random() - 0.5) * 0.012));
       const plng = p.lng !== undefined ? parseFloat(p.lng) : (p.longitude ? parseFloat(p.longitude) : (userLng + (Math.random() - 0.5) * 0.012));
       
-      // Store exact matched properties
       p.lat = plat;
       p.lng = plng;
       window.chatProvidersList[p.id] = p;
 
-      const marker = new google.maps.Marker({
-        position: { lat: plat, lng: plng },
-        map: chatMap,
-        icon: {
-          url: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png'
-        },
-        title: p.name
+      const providerIcon = L.divIcon({
+        html: `<div style="background:#F5A623; width:14px; height:14px; border:2.5px solid white; border-radius:50%; box-shadow:0 0 6px rgba(0,0,0,0.3);"></div>`,
+        className: 'custom-pin-prov',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
       });
+
+      const marker = L.marker([plat, plng], { icon: providerIcon, title: p.name }).addTo(chatMap);
       chatMarkers.push(marker);
 
       const popupHTML = `
-        <div style="font-family:var(--f); min-width: 140px; text-align: center; line-height: 1.4;">
+        <div style="font-family:var(--f); min-width: 140px; text-align: center; line-height: 1.4; padding: 4px;">
           <h4 style="margin: 0 0 2px 0; font-size:13px; font-weight:700; color: var(--blk);">${p.name}</h4>
           <p style="margin: 0 0 6px 0; font-size: 10px; color: var(--gray);">${p.distance || '1.2 km'} away · ★ ${p.rating}</p>
           <div style="font-weight: 800; color: var(--blk); font-size: 13px; margin-bottom: 6px;">${p.totalEstimate}</div>
-          <button class="btn-blk" style="font-size: 9px; padding: 4px 8px; border-radius: 8px; width: 100%; height: auto; line-height: 1;" onclick="window.openQFromMarker('${p.id}')">⚡ Instant Book</button>
+          <button class="btn-blk" style="font-size: 9px; padding: 4px 8px; border-radius: 8px; width: 100%; height: auto; line-height: 1; cursor:pointer;" onclick="window.openQFromMarker('${p.id}')">⚡ Instant Book</button>
         </div>
       `;
 
-      const infowindow = new google.maps.InfoWindow({
-        content: popupHTML
-      });
-
-      marker.addListener('click', () => {
-        infowindow.open(chatMap, marker);
-      });
+      marker.bindPopup(popupHTML);
     });
   } catch (mapErr) {
     console.error('Error rendering chat map:', mapErr);
@@ -1910,10 +2145,30 @@ async function cancelReassignment() {
 function startTracking(bookingId) {
   if (trackingInterval) clearInterval(trackingInterval);
   
+  // Safe Leaflet cleanup to prevent "Map container is already initialized" errors
+  if (trackerMap && typeof trackerMap.remove === 'function') {
+    try {
+      trackerMap.remove();
+    } catch (e) {
+      console.warn('Map remove failed:', e);
+    }
+  }
+  trackerMap = null;
+  trackerMarkers = [];
+  trackerRouteLine = null;
+  targetLat = null;
+  targetLng = null;
+
+  // Join Socket.IO booking room for real-time updates
+  if (socket && socket.connected) {
+    socket.emit('join_booking', bookingId);
+    console.log('[Rozgo] Joined live tracking room for booking:', bookingId);
+  }
+  
   // Set UI elements initial states
   updateTrackerUI('confirmed');
 
-  // Poll status every 3 seconds
+  // Poll status every 3 seconds (fallback alongside Socket.IO)
   trackingInterval = setInterval(async () => {
     try {
       const res = await fetch(`${API_URL}/trackers/${bookingId}`, {
@@ -1975,7 +2230,14 @@ let trackerRouteLine = null;
 let lastLoggedStatus = {};
 let currentProvLat = null;
 let currentProvLng = null;
+let targetLat = null;
+let targetLng = null;
 let trackerAnimationInterval = null;
+
+function updateProviderMarkerLive(lat, lng) {
+  targetLat = parseFloat(lat);
+  targetLng = parseFloat(lng);
+}
 
 function updateTrackerUI(status, provider, trackerData) {
   const steps = document.querySelectorAll('#tracker .step');
@@ -2009,28 +2271,33 @@ function updateTrackerUI(status, provider, trackerData) {
   const startLat = provider && provider.lat ? provider.lat : (selectedProvider && selectedProvider.lat ? selectedProvider.lat : userLat + 0.009);
   const startLng = provider && provider.lng ? provider.lng : (selectedProvider && selectedProvider.lng ? selectedProvider.lng : userLng + 0.007);
 
-  // Target provider coordinates depending on booking status progression
-  let targetLat = userLat;
-  let targetLng = userLng;
-
-  if (status === 'confirmed' || status === 'accepted') {
-    targetLat = startLat;
-    targetLng = startLng;
-  } else if (status === 'en_route') {
-    // halfway to home coordinates
-    targetLat = userLat + (startLat - userLat) * 0.4;
-    targetLng = userLng + (startLng - userLng) * 0.4;
-  } else if (status === 'arrived' || status === 'completed') {
-    targetLat = userLat;
-    targetLng = userLng;
+  // Target provider coordinates depending on booking status progression if not set by live updates
+  if (targetLat === null || targetLng === null) {
+    if (status === 'confirmed' || status === 'accepted') {
+      targetLat = startLat;
+      targetLng = startLng;
+    } else if (status === 'en_route') {
+      // halfway to home coordinates
+      targetLat = userLat + (startLat - userLat) * 0.4;
+      targetLng = userLng + (startLng - userLng) * 0.4;
+    } else if (status === 'arrived' || status === 'completed') {
+      targetLat = userLat;
+      targetLng = userLng;
+    }
+  } else {
+    // If status transitions, override coordinates to match progression
+    if (status === 'arrived' || status === 'completed') {
+      targetLat = userLat;
+      targetLng = userLng;
+    }
   }
 
-  // Initialize/Update Google Tracker Map
+  // Initialize/Update Leaflet Tracker Map
   const mapBox = document.getElementById('tracker-map');
   if (mapBox) {
     try {
-      if (typeof google === 'undefined' || !google.maps) {
-        console.warn('Google Maps not loaded in tracker yet.');
+      if (typeof L === 'undefined') {
+        console.warn('Leaflet not loaded in tracker yet.');
         return;
       }
 
@@ -2038,95 +2305,85 @@ function updateTrackerUI(status, provider, trackerData) {
         currentProvLat = startLat;
         currentProvLng = startLng;
 
-        trackerMap = new google.maps.Map(document.getElementById('tracker-map'), {
-          zoom: 15,
-          center: { lat: userLat, lng: userLng },
-        disableDefaultUI: true,
-        styles: [
-          {
-            featureType: "poi",
-            elementType: "labels",
-            stylers: [{ visibility: "off" }]
-          }
-        ]
-      });
+        trackerMap = L.map('tracker-map', {
+          zoomControl: false,
+          attributionControl: false
+        }).setView([userLat, userLng], 15);
 
-      // Draw user home marker
-      const userMarker = new google.maps.Marker({
-        position: { lat: userLat, lng: userLng },
-        map: trackerMap,
-        icon: {
-          url: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
-        },
-        title: 'Your Location'
-      });
-      trackerMarkers.push(userMarker);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+          maxZoom: 20
+        }).addTo(trackerMap);
 
-      // Draw provider marker
-      const iconUrl = 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
-      const providerMarker = new google.maps.Marker({
-        position: { lat: currentProvLat, lng: currentProvLng },
-        map: trackerMap,
-        icon: {
-          url: iconUrl
-        },
-        title: providerName
-      });
-      trackerMarkers.push(providerMarker);
+        // Draw user home marker
+        const userIcon = L.divIcon({
+          html: `<div style="background:#34A853; width:16px; height:16px; border:2.5px solid white; border-radius:50%; box-shadow:0 0 8px rgba(0,0,0,0.3);"></div>`,
+          className: 'tracker-pin-user',
+          iconSize: [16, 16],
+          iconAnchor: [8, 8]
+        });
 
-      // Draw polyline route path
-      trackerRouteLine = new google.maps.Polyline({
-        path: [
-          { lat: currentProvLat, lng: currentProvLng },
-          { lat: userLat, lng: userLng }
-        ],
-        geodesic: true,
-        strokeColor: '#1A73E8',
-        strokeOpacity: 0.8,
-        strokeWeight: 4,
-        map: trackerMap
-      });
-    }
+        const userMarker = L.marker([userLat, userLng], { icon: userIcon, title: 'Your Location' }).addTo(trackerMap);
+        trackerMarkers.push(userMarker);
 
-    // Dynamic icon toggle according to status
-    const pMarker = trackerMarkers[1];
-    if (pMarker) {
-      const newIcon = (status === 'en_route') 
-        ? 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-        : 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
-      pMarker.setIcon(newIcon);
-      pMarker.setTitle(providerName);
-    }
+        // Draw provider marker
+        const providerIcon = L.divIcon({
+          html: `<div id="live-prov-pin" style="background:#F5A623; width:16px; height:16px; border:2.5px solid white; border-radius:50%; box-shadow:0 0 8px rgba(0,0,0,0.3); transition: background 0.3s;"></div>`,
+          className: 'tracker-pin-prov',
+          iconSize: [16, 16],
+          iconAnchor: [8, 8]
+        });
 
-    // Easing interpolation loop for smooth hackathon tracking slides
-    if (trackerAnimationInterval) clearInterval(trackerAnimationInterval);
+        const providerMarker = L.marker([currentProvLat, currentProvLng], { icon: providerIcon, title: providerName }).addTo(trackerMap);
+        trackerMarkers.push(providerMarker);
 
-    trackerAnimationInterval = setInterval(() => {
-      const easeSpeed = 0.05; // 5% movement per 50ms for ultra-smooth progression
-      currentProvLat += (targetLat - currentProvLat) * easeSpeed;
-      currentProvLng += (targetLng - currentProvLng) * easeSpeed;
-
-      if (pMarker) {
-        pMarker.setPosition({ lat: currentProvLat, lng: currentProvLng });
+        // Draw polyline route path
+        trackerRouteLine = L.polyline([
+          [currentProvLat, currentProvLng],
+          [userLat, userLng]
+        ], {
+          color: '#1A73E8',
+          weight: 4,
+          opacity: 0.8
+        }).addTo(trackerMap);
       }
-      if (trackerRouteLine) {
-        trackerRouteLine.setPath([
-          { lat: currentProvLat, lng: currentProvLng },
-          { lat: userLat, lng: userLng }
+
+      // Dynamic icon style toggle according to status
+      const pinElement = document.getElementById('live-prov-pin');
+      if (pinElement) {
+        pinElement.style.background = (status === 'en_route') ? '#1A73E8' : '#F5A623';
+      }
+
+      // Easing interpolation loop for smooth hackathon tracking slides
+      if (trackerAnimationInterval) clearInterval(trackerAnimationInterval);
+
+      const pMarker = trackerMarkers[1];
+      trackerAnimationInterval = setInterval(() => {
+        const easeSpeed = 0.05; // 5% movement per 50ms for ultra-smooth progression
+        currentProvLat += (targetLat - currentProvLat) * easeSpeed;
+        currentProvLng += (targetLng - currentProvLng) * easeSpeed;
+
+        if (pMarker) {
+          pMarker.setLatLng([currentProvLat, currentProvLng]);
+        }
+        if (trackerRouteLine) {
+          trackerRouteLine.setLatLngs([
+            [currentProvLat, currentProvLng],
+            [userLat, userLng]
+          ]);
+        }
+
+        // Re-center map to capture user & smoothly moving worker in viewport
+        const bounds = L.latLngBounds([
+          [userLat, userLng],
+          [currentProvLat, currentProvLng]
         ]);
-      }
+        trackerMap.fitBounds(bounds, { padding: [40, 40] });
 
-      // Re-center map to capture user & smoothly moving worker in viewport
-      const bounds = new google.maps.LatLngBounds();
-      bounds.extend({ lat: userLat, lng: userLng });
-      bounds.extend({ lat: currentProvLat, lng: currentProvLng });
-      trackerMap.fitBounds(bounds);
-
-      // Stop interpolation loop when very close to target coordinates
-      if (Math.abs(currentProvLat - targetLat) < 0.00005 && Math.abs(currentProvLng - targetLng) < 0.00005) {
-        clearInterval(trackerAnimationInterval);
-      }
-    }, 50);
+        // Stop interpolation loop when very close to target coordinates
+        if (Math.abs(currentProvLat - targetLat) < 0.00005 && Math.abs(currentProvLng - targetLng) < 0.00005) {
+          clearInterval(trackerAnimationInterval);
+        }
+      }, 50);
     } catch (trackerMapErr) {
       console.error('Error rendering tracker map:', trackerMapErr);
     }
@@ -2191,6 +2448,69 @@ async function completeJob() {
   } catch (err) {
     console.error(err);
     document.getElementById('revmod').classList.add('open'); // fallback
+  }
+}
+
+// Open Cancel Booking Modal with elapsed time penalty detection
+function openCancelBookingModal() {
+  if (!currentBooking) {
+    tst('No Active Booking', 'Cannot cancel at this time.');
+    return;
+  }
+
+  // Calculate elapsed time in minutes since booking creation
+  const createdTime = new Date(currentBooking.createdAt).getTime();
+  const elapsedMinutes = (Date.now() - createdTime) / 60000;
+
+  const penaltyWarning = document.getElementById('cancel-penalty-warning');
+  const noPenaltyInfo = document.getElementById('cancel-no-penalty-info');
+
+  if (elapsedMinutes > 5) {
+    penaltyWarning.style.display = 'block';
+    noPenaltyInfo.style.display = 'none';
+  } else {
+    penaltyWarning.style.display = 'none';
+    noPenaltyInfo.style.display = 'block';
+  }
+
+  document.getElementById('cancelBookingMod').classList.add('open');
+}
+
+// Confirm booking cancellation via API call
+async function confirmCancelBooking() {
+  if (!currentBooking) return;
+
+  const reason = document.getElementById('cancel-reason').value;
+  
+  try {
+    const res = await fetch(`${API_URL}/bookings/${currentBooking.id}/cancel`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ reason })
+    });
+
+    const data = await res.json();
+    document.getElementById('cancelBookingMod').classList.remove('open');
+
+    if (res.ok) {
+      if (data.penaltyApplied) {
+        tst('Cancelled with Penalty ⚠️', `A penalty of Rs. ${data.cancellationFee} was charged.`);
+      } else {
+        tst('Cancelled Successfully ✓', 'Your booking was cancelled.');
+      }
+      // Stop tracking interval
+      if (trackingInterval) clearInterval(trackingInterval);
+      currentBooking = null;
+      go('chat');
+    } else {
+      tst('Cancellation Error', data.message || 'Could not cancel booking.');
+    }
+  } catch (err) {
+    console.error(err);
+    tst('Network Error', 'Connection failed.');
   }
 }
 
@@ -2374,13 +2694,19 @@ function loadUserProfile() {
   const name = localStorage.getItem('user_name') || 'Ali Hassan';
   const email = localStorage.getItem('user_email') || 'ali@example.com';
   const role = localStorage.getItem('role') || 'consumer';
+  const profilePic = localStorage.getItem('user_profile_pic');
   
   document.querySelector('#profile .prfnm').textContent = name;
   document.querySelector('#profile .prfem').textContent = email;
   
-  // Set Avatar initials
-  const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-  document.querySelector('#profile .prfav').textContent = initials;
+  // Set Avatar — show profile picture if available, otherwise show initials
+  const avatarEl = document.querySelector('#profile .prfav');
+  if (profilePic) {
+    avatarEl.innerHTML = `<img src="${profilePic}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+  } else {
+    const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+    avatarEl.textContent = initials;
+  }
 
   const roleTag = document.querySelector('#profile .prftag span');
   if (role === 'provider') {
@@ -2834,11 +3160,13 @@ function openSettings() {
   const location = localStorage.getItem('settings_location') !== 'false';
   const simulatedDark = document.body.classList.contains('dark-sim');
   const code = localStorage.getItem('demo_code') || (localStorage.getItem('role') === 'provider' ? 'PROV-2026' : 'USER-2026');
+  const backendUrl = localStorage.getItem('backend_api_url') || '';
   
   document.getElementById('set-notify').checked = notify;
   document.getElementById('set-location').checked = location;
   document.getElementById('set-dark').checked = simulatedDark;
   document.getElementById('set-code').value = code;
+  document.getElementById('set-backend-url').value = backendUrl;
   
   document.getElementById('set-code').classList.remove('err');
   document.getElementById('set-codeerr').classList.remove('on');
@@ -2872,6 +3200,7 @@ function saveSettings() {
   const notify = document.getElementById('set-notify').checked;
   const location = document.getElementById('set-location').checked;
   const code = document.getElementById('set-code').value.trim();
+  const backendUrl = document.getElementById('set-backend-url').value.trim();
   
   if (code.length < 4) {
     document.getElementById('set-code').classList.add('err');
@@ -2883,8 +3212,18 @@ function saveSettings() {
   localStorage.setItem('settings_location', location);
   localStorage.setItem('demo_code', code);
   
+  const oldUrl = localStorage.getItem('backend_api_url') || '';
+  localStorage.setItem('backend_api_url', backendUrl);
+  
   tst('Settings Saved', 'App preferences updated');
   document.getElementById('settingsMod').classList.remove('open');
+  
+  // If the backend URL changed, reload the page to apply new connections immediately
+  if (oldUrl !== backendUrl) {
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
 }
 
 // God Mode Simulation Panel

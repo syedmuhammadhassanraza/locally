@@ -24,7 +24,7 @@ const handleChat = async (req, res) => {
 
     // 3. If clarification is needed (confidence < 70%), respond with a question
     if (needsClarification) {
-      const clarifyReply = `I'm ${confidence}% sure you need a **${serviceType}** service. ${clarificationQuestion || 'Could you provide more details about the issue?'}`;
+      const clarifyReply = intentResult.friendlyReply || `I'm ${confidence}% sure you need a **${serviceType}** service. ${clarificationQuestion || 'Could you provide more details about the issue?'}`;
       messages.push({
         sender: 'ai',
         content: clarifyReply,
@@ -110,7 +110,7 @@ const handleChat = async (req, res) => {
       };
     });
 
-    const aiReply = `✅ **${confidence}% confident** — identified a **${serviceType}** need (complexity: ${complexityTier}, urgency: ${urgencyScore}/10).\n\nHere are the top-ranked professionals nearby:`;
+    const aiReply = intentResult.friendlyReply || `✅ **${confidence}% confident** — identified a **${serviceType}** need (complexity: ${complexityTier}, urgency: ${urgencyScore}/10).\n\nHere are the top-ranked professionals nearby:`;
 
     messages.push({
       sender: 'ai',

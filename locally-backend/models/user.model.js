@@ -51,6 +51,18 @@ const User = sequelize.define('User', {
   manualLocation: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
+  },
+  emailVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  phoneVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  profilePicture: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 

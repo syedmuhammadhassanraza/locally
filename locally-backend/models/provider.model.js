@@ -87,6 +87,27 @@ const Provider = sequelize.define('Provider', {
   tier: {
     type: DataTypes.INTEGER,
     defaultValue: 1  // 1=Basic, 2=Standard, 3=Complex
+  },
+  trustBadges: {
+    type: DataTypes.JSON,
+    allowNull: true,
+    defaultValue: []
+  },
+  fcmToken: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  emailVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  phoneVerified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  profilePicture: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 });
 

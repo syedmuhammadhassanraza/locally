@@ -2,49 +2,55 @@
 
 Welcome to **Rozgo**, the premium AI-driven local service matching platform designed for absolute speed, reliability, and precision. Rozgo connects consumers with top-rated local professionals in real-time, utilizing advanced LLM intent parsing, dynamic matching algorithms, and ultra-smooth tracking visuals.
 
-## 🚀 Hackathon Winning Features
+---
 
-### 🧠 LLM-Powered Intent Parsing
-Rozgo natively integrates with Gemini AI to understand the natural language of the user. Whether you say "I have a leaky pipe" or "Need someone to fix the AC", the backend mathematically categorizes the service type, gauges the urgency, assesses the complexity tier, and matches it with the right service professionals.
+## 🚀 Key Features & Production Updates
 
-### 📍 Mathematical Coordinate Shifting & Real-Time Proximity (2-3 km)
-The matching system respects the user's actual device GPS. Rozgo guarantees that matched providers are mathematically mapped **exactly between 1.5 and 2.8 kilometers** away from the consumer's location. This ensures highly realistic, hackathon-level accurate map demonstrations no matter where in the world the app is tested.
+### 🧠 LLM-Powered Intent Parsing & Automatic Tracing
+Rozgo natively integrates with Gemini AI to understand natural language expressions.
+- **Auto-Telemetry Tracing:** Model engineering updates, prompts, files affected, and execution logs are dynamically tracked and appended to `antigravity_trace.txt` and `locally-backend/logs/prompt_history.json`.
 
-### 🏎️ Smooth 20Hz Easing Map Interpolation
-Gone are the days of flickery map tracking! Rozgo uses a custom 20fps easing interpolation algorithm integrated natively with the **Google Maps SDK**. When a booking is accepted, the provider's vehicle smoothly glides street-by-street towards the user's location with dynamic camera refitting.
+### 📍 Device-Native Geolocation & Smart Fallbacks
+- **Live Location Prompt:** Upon application startup, the system prompts the user for browser/device Geolocation permissions.
+- **Graceful Fallbacks:** If granted, the app centers on the user's real coordinates. If denied, it seamlessly switches to the Rawalpindi coordinate cluster to ensure flawless continuity.
 
-### 🗄️ Robust TiDB SQL Backend Architecture
-The system runs on a robust Sequelize + TiDB (MySQL) backend with cleanly structured associative tables:
-* **Users** (Consumers tracking their requests)
-* **Providers** (Service professionals with real-time ratings, reviews, and completion data)
-* **Bookings** (Financial tracking, complexity metrics, dynamic status flows)
-* **Chats** & **Reviews** (History storage and dynamic feedback systems)
-* Automated TiDB schema synchronizations to prevent column drift.
+### 📶 Dynamic API Configurations (Production Ready)
+- **API Server Override:** Easily configure custom backend IPs or domain names directly from the frontend's **Settings Modal**.
+- **Mobile Compatibility:** By storing the custom server endpoint inside LocalStorage (`backend_api_url`), the compiled Capacitor APK discovers the public API instantly from any location.
 
-### 🛡️ Secure Verification & Error-Free Flows
-- **Strict Validations:** Built-in 13-digit strict Pakistani CNIC validation (frontend & backend).
-- **Auto-Reassignment:** If a provider is unavailable, the backend automatically reroutes the request and dynamically assigns the next available provider.
+### 🛡️ Production Telemetry & Logging System
+All server behaviors are written to separate log files under `locally-backend/logs/`:
+- `runtime.log`: Captures database syncing, boot processes, and exception traces.
+- `api_requests.log`: Logs incoming API HTTP requests, latencies, status codes, IPs, and payloads (sensitive data redacted).
+- `socket_events.log`: Tracks WebSocket connections, status updates, joins, and location updates.
+- `errors.log`: Records stack traces and backend error anomalies.
+- `frontend_errors.log`: Receives unhandled frontend script exceptions sent from the mobile or web clients.
 
 ---
 
-## 🛠️ Technology Stack
+## 📱 Mobile APK Compilation (Capacitor)
 
-**Frontend:**
-- Pure Vanilla JavaScript, HTML, CSS (Lightning Fast, zero bloat)
-- Google Maps JavaScript SDK
-- Glassmorphism & Modern Easing Animations
+The platform is wrapped into a native Android container using **CapacitorJS**. We've implemented a robust, fully automated build pipeline that compiled the release wrapper successfully using **Gradle**.
 
-**Backend:**
-- Node.js & Express.js
-- Sequelize ORM
-- TiDB Cloud Database (MySQL)
-- Google Gemini API (Service orchestration & NLP)
+### How to Compile the APK (Automated PowerShell Script)
+To build a clean native APK wrapper from scratch:
+
+1. **Verify environment setup:** Ensure JDK 17 and Android SDK platforms are installed.
+2. **Execute build script:** From the root workspace directory, run:
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\build-apk.ps1
+   ```
+This script dynamically:
+- Copies the latest static frontend files into the Capacitor web assets bundle (`www/`).
+- Invokes `npx cap sync` to update the native Android configurations.
+- Resolves read-only Android SDK directory limitations using local system junction links and forced compiler overrides (SDK 35 and Build-Tools 35.0.0).
+- Compiles a debug APK (`app-debug.apk`) and places it directly in both the project root and the conversation artifacts folder.
 
 ---
 
 ## 💻 Running the App Locally
 
-Rozgo has a unified architectural design. The Express backend serves the API and the static frontend application over a single port, circumventing any CORS issues.
+Rozgo uses a unified architecture where the Node.js Express server hosts both the backend APIs and serves the static frontend package.
 
 1. **Install Dependencies:**
    ```bash
@@ -52,21 +58,21 @@ Rozgo has a unified architectural design. The Express backend serves the API and
    npm install
    ```
 
-2. **Setup the Environment Variable (`locally-backend/.env`):**
-   You need standard TiDB connection credentials and a Google Gemini API Key.
+2. **Configure Environment Variables (`locally-backend/.env`):**
+   Provide the cloud TiDB SQL database credentials, port configuration, and Gemini API keys.
 
-3. **Run the Application:**
+3. **Start the Express API Server:**
    ```bash
    npm start
    ```
 
-4. **Access:**
-   Navigate to `http://localhost:5000` in your web browser.
+4. **Access the Application:**
+   Open `http://localhost:5000` in your web browser.
 
 ---
 
 ## 🎭 Demo Access Roles
-- **Consumer:** Login with generic demo user using code `USER-2026`.
-- **Provider:** Login via the Provider portal with code `PROV-2026`.
+- **Consumer Portal:** Login with access code `USER-2026`.
+- **Provider Portal:** Login with access code `PROV-2026`.
 
-*Designed and engineered for peak performance and visual excellence.*
+*Designed and engineered for peak performance, extreme visual excellence, and enterprise-grade reliability.*
